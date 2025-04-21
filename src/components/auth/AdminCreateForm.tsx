@@ -60,6 +60,35 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
     setError(`Por favor, aguarde ${waitTime} segundos antes de tentar novamente.`);
   };
 
+  // Verificar se o profile já existe
+  const checkProfileExists = async (userId: string) => {
+    try {
+      const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
+      
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=id`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Erro ao verificar perfil: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Se encontrar um perfil, retorna true
+      return data && data.length > 0;
+    } catch (error) {
+      console.error("Erro ao verificar perfil:", error);
+      return false;
+    }
+  };
+
   const criarPrimeiroAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -111,50 +140,113 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       }
 
       console.log("Usuário criado com sucesso:", authData.user.id);
-
-      // Passo 2: Inserir diretamente na tabela profiles usando a REST API do Supabase
-      // Isto evita o problema de Row Level Security para a primeira inserção
-      const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
-      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
       
-      const profileData = {
-        id: authData.user.id,
-        email,
-        nome,
-        role: 'admin',
-        created_at: new Date().toISOString(),
-      };
+      // Verificar se já existe um perfil com este ID (pode ocorrer devido ao trigger de criação de perfil)
+      const profileExists = await checkProfileExists(authData.user.id);
       
-      console.log("Tentando criar perfil via REST API:", profileData);
-      
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`,
-          'Prefer': 'return=minimal'
-        },
-        body: JSON.stringify(profileData)
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Erro ao criar perfil via REST API:", errorData);
-        setError(errorData.message || "Erro ao criar perfil de administrador");
+      if (profileExists) {
+        console.log("Perfil já existe, atualizando para admin");
         
-        // Tentar limpar o usuário criado
-        try {
-          await supabase.auth.admin.deleteUser(authData.user.id);
-          console.log("Usuário deletado após falha ao criar perfil");
-        } catch (deleteError) {
-          console.error("Não foi possível deletar o usuário após falha:", deleteError);
+        // Usar API REST para atualizar o perfil para admin
+        const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
+        
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.user.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            role: 'admin',
+            nome,
+            email
+          })
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Erro ao atualizar perfil para admin");
         }
         
-        throw new Error(errorData.message || "Erro ao criar perfil");
+        console.log("Perfil atualizado para admin com sucesso");
+      } else {
+        // Passo 2: Inserir diretamente na tabela profiles usando a REST API do Supabase
+        // Isto evita o problema de Row Level Security para a primeira inserção
+        const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
+        
+        const profileData = {
+          id: authData.user.id,
+          email,
+          nome,
+          role: 'admin',
+          created_at: new Date().toISOString(),
+        };
+        
+        console.log("Tentando criar perfil via REST API:", profileData);
+        
+        try {
+          const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': SUPABASE_KEY,
+              'Authorization': `Bearer ${SUPABASE_KEY}`,
+              'Prefer': 'return=minimal'
+            },
+            body: JSON.stringify(profileData)
+          });
+          
+          if (!response.ok) {
+            // Se for erro de chave duplicada, significa que o perfil já existe
+            if (response.status === 409 || (await response.text()).includes('profiles_pkey')) {
+              console.log("Perfil já existe no banco, fazendo update para admin");
+              
+              // Tentar atualizar o perfil para admin
+              const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.user.id}`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'apikey': SUPABASE_KEY,
+                  'Authorization': `Bearer ${SUPABASE_KEY}`,
+                  'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({
+                  role: 'admin',
+                  nome,
+                  email
+                })
+              });
+              
+              if (!updateResponse.ok) {
+                throw new Error("Erro ao atualizar perfil para admin");
+              }
+              
+              console.log("Perfil atualizado para admin com sucesso");
+            } else {
+              throw new Error("Erro ao criar perfil de administrador");
+            }
+          } else {
+            console.log("Perfil de admin criado com sucesso via REST API");
+          }
+        } catch (profileError: any) {
+          console.error("Erro ao criar/atualizar perfil:", profileError);
+          
+          // Se não conseguiu criar o perfil, tenta deletar o usuário
+          try {
+            console.log("Tentando deletar usuário após falha no perfil");
+            await supabase.auth.admin.deleteUser(authData.user.id);
+            console.log("Usuário deletado após falha ao criar perfil");
+          } catch (deleteError) {
+            console.error("Não foi possível deletar o usuário após falha:", deleteError);
+          }
+          
+          throw profileError;
+        }
       }
-
-      console.log("Perfil de admin criado com sucesso via REST API");
 
       toast({
         title: "Usuário Administrador Criado",
@@ -169,13 +261,22 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       console.error('Erro ao criar admin:', error);
       
       if (!cooldown) {
-        setError(error.message || "Ocorreu um erro inesperado");
-        
-        toast({
-          title: "Erro ao criar usuário",
-          description: error.message || "Ocorreu um erro inesperado",
-          variant: "destructive",
-        });
+        // Tratamento especial para erro de chave duplicada (perfil já existe)
+        if (error.message?.includes('profiles_pkey') || error.message?.includes('duplicate key')) {
+          setError("Um perfil com este ID já existe. Tente fazer login ou use outro email.");
+          toast({
+            title: "Usuário já existe",
+            description: "Um perfil com este email já existe. Tente fazer login.",
+            variant: "destructive",
+          });
+        } else {
+          setError(error.message || "Ocorreu um erro inesperado");
+          toast({
+            title: "Erro ao criar usuário",
+            description: error.message || "Ocorreu um erro inesperado",
+            variant: "destructive",
+          });
+        }
       }
     } finally {
       if (!cooldown) {
