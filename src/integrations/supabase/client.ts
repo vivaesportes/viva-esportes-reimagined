@@ -13,7 +13,7 @@ const supabaseOptions = {
     persistSession: true,
     detectSessionInUrl: true,
     storageKey: 'viva_auth_token',
-    flowType: 'pkce',
+    flowType: 'pkce' as const,
   }
 };
 
@@ -44,6 +44,6 @@ export const getLoginRedirectOptions = () => {
 // Check if Supabase is properly configured
 export function isSupabaseConfigured() {
   return SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && 
-         SUPABASE_URL !== 'YOUR_SUPABASE_URL' && 
-         SUPABASE_PUBLISHABLE_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+         SUPABASE_URL !== '' && 
+         SUPABASE_PUBLISHABLE_KEY !== '';
 }
