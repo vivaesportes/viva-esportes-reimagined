@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/auth/types";
@@ -8,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { LoadingState } from "./LoadingState";
 import { supabase } from "@/lib/supabase";
 import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
+import { toast } from "@/hooks/use-toast";
 
 interface RotaProtegidaProps {
   children: React.ReactNode;
@@ -32,7 +32,6 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   const [resetAttempted, setResetAttempted] = useState(false);
   const { loadingTimeout, longLoadingTimeout } = useLoadingTimeout(loading);
 
-  // Debug info logging
   useEffect(() => {
     console.log("Protected Route - Auth state:", { 
       isAuthenticated, 
@@ -40,17 +39,16 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
       isAdmin,
       path: location.pathname,
       loading,
-      authError
+      authError,
+      nivelRequerido
     });
 
-    // Se estiver autenticado mas não tiver perfil, tente buscar o perfil novamente
     if (isAuthenticated && !profile && !loading && !retrying) {
       console.log("Usuário autenticado mas sem perfil. Tentando buscar perfil...");
       handleRetry();
     }
-  }, [isAuthenticated, profile, isAdmin, location, loading, authError]);
+  }, [isAuthenticated, profile, isAdmin, location, loading, authError, nivelRequerido]);
 
-  // Handlers for loading state actions
   const handleRetry = async () => {
     setRetrying(true);
     try {
@@ -66,7 +64,6 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   const handleReset = () => {
     setResetAttempted(true);
     resetAuthState();
-    // Reset will be handled by auth state changes
   };
 
   const handleForceLogout = async () => {
@@ -74,7 +71,6 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     window.location.href = '/login';
   };
 
-  // Se estiver carregando ou verificando o banco de dados
   if (loading || checkingDatabase) {
     return (
       <LoadingState
@@ -92,13 +88,11 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
-  // Se não estiver autenticado após carregar, redirecione para login
   if (!isAuthenticated) {
     console.log("Usuário não autenticado. Redirecionando para login.");
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Se estiver autenticado mas não tiver perfil
   if (isAuthenticated && !profile) {
     console.log("Usuário autenticado mas sem perfil. Exibindo estado de carregamento.");
     return (
@@ -117,9 +111,13 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
-  // Verifica se o usuário tem o nível requerido
-  if (nivelRequerido === 'admin' && !isAdmin) {
+  if (nivelRequerido === 'admin' && profile?.role !== 'admin') {
     console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
+    toast({
+      title: "Acesso negado",
+      description: "Você não tem permissão para acessar esta página",
+      variant: "destructive",
+    });
     return <Navigate to="/painel" replace />;
   }
 

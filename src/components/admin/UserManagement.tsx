@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { CreateUserDialog } from './users/CreateUserDialog';
 import { ResetPasswordDialog } from './users/ResetPasswordDialog';
 import { UserTable } from './users/UserTable';
+import { checkProfileExists } from '@/hooks/useProfileCheck';
 
 interface Usuario {
   id: string;
@@ -148,7 +149,12 @@ export const UserManagement = ({ usuarios, loading, setUsuarios }: {
     try {
       setActionLoading(true);
       
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      // Modificado para excluir diretamente da tabela de perfis (profiles)
+      // A exclusão do auth.users pode ser tratada por um trigger no banco de dados
+      const { error } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
 
       if (error) throw error;
 
