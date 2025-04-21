@@ -1,15 +1,11 @@
 
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from "@/components/ui/dialog";
-import { UserPlus } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
-import { CreateUserDialog } from './users/CreateUserDialog';
-import { ResetPasswordDialog } from './users/ResetPasswordDialog';
+import { Card, CardContent } from '@/components/ui/card';
+import { Dialog } from "@/components/ui/dialog";
 import { UserTable } from './users/UserTable';
-import { checkProfileExists } from '@/hooks/useProfileCheck';
+import { ResetPasswordDialog } from './users/ResetPasswordDialog';
+import { UserManagementHeader } from './users/UserManagementHeader';
+import { useUserManagement } from '@/hooks/useUserManagement';
 
 interface Usuario {
   id: string;
@@ -19,209 +15,43 @@ interface Usuario {
   created_at: string;
 }
 
-export const UserManagement = ({ usuarios, loading, setUsuarios }: { 
+export const UserManagement = ({ 
+  usuarios: initialUsuarios, 
+  loading, 
+  setUsuarios: setParentUsuarios 
+}: { 
   usuarios: Usuario[], 
   loading: boolean,
   setUsuarios: React.Dispatch<React.SetStateAction<Usuario[]>>
 }) => {
   const [openDialog, setOpenDialog] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
-  const [actionLoading, setActionLoading] = useState(false);
   const [resetSenha, setResetSenha] = useState({ email: '', id: '' });
 
-  const handleCriarUsuario = async (formData: {
-    nome: string;
-    email: string;
-    senha: string;
-    role: string;
-  }) => {
-    try {
-      if (!formData.nome || !formData.email || !formData.senha) {
-        toast({
-          title: "Dados incompletos",
-          description: "Preencha todos os campos obrigatórios",
-          variant: "destructive",
-        });
-        return;
-      }
+  const {
+    usuarios,
+    actionLoading,
+    handleCriarUsuario,
+    handleExcluirUsuario,
+    handleResetarSenha
+  } = useUserManagement(initialUsuarios);
 
-      setActionLoading(true);
-      
-      // Usando o signup diretamente em vez de admin.createUser
-      // que requer permissão de service_role
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.senha,
-        options: {
-          data: {
-            nome: formData.nome,
-            role: formData.role
-          },
-          emailRedirectTo: `${window.location.origin}/login`
-        }
-      });
-
-      if (authError) throw authError;
-
-      // Se tiver criado com sucesso o usuário
-      if (authData.user) {
-        // Tenta atualizar diretamente a tabela de profiles
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([{ 
-            id: authData.user.id,
-            email: formData.email,
-            nome: formData.nome,
-            role: formData.role
-          }])
-          .select();
-
-        if (profileError) {
-          console.warn("Aviso: O perfil pode ser criado automaticamente via trigger:", profileError);
-        }
-      }
-
-      toast({
-        title: "Usuário criado com sucesso",
-        description: `${formData.nome} foi adicionado como ${formData.role === 'admin' ? 'administrador' : 'professor'}`,
-      });
-
-      // Recarrega a lista de usuários
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setUsuarios(data || []);
-      setOpenDialog(false);
-    } catch (error: any) {
-      console.error('Erro ao criar usuário:', error);
-      toast({
-        title: "Erro ao criar usuário",
-        description: error.message || "Ocorreu um erro ao criar o usuário",
-        variant: "destructive",
-      });
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleResetarSenha = async () => {
-    try {
-      if (!resetSenha.email) {
-        toast({
-          title: "E-mail não informado",
-          description: "Informe o e-mail do usuário",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setActionLoading(true);
-      
-      const { error } = await supabase.auth.resetPasswordForEmail(resetSenha.email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Link de redefinição enviado",
-        description: "Um e-mail com instruções foi enviado para o usuário",
-      });
-
-      setResetSenha({ email: '', id: '' });
-      setOpenResetDialog(false);
-    } catch (error: any) {
-      console.error('Erro ao enviar link de redefinição:', error);
-      toast({
-        title: "Erro ao enviar link",
-        description: error.message || "Ocorreu um erro ao enviar o link de redefinição",
-        variant: "destructive",
-      });
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleExcluirUsuario = async (userId: string) => {
-    try {
-      setActionLoading(true);
-      
-      // Primeiro, excluir o usuário do auth.users usando admin API
-      const { error: authError } = await supabase.auth.admin.deleteUser(
-        userId,
-        true // Also cascade delete associated profile data
-      );
-      
-      if (authError) {
-        console.error('Erro ao excluir usuário do auth system:', authError);
-        
-        // Tenta o método alternativo - excluir diretamente da tabela de profiles
-        // se não conseguir excluir do auth.users
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .delete()
-          .eq('id', userId);
-          
-        if (profileError) throw profileError;
-      }
-      
-      // Independentemente do método, atualiza a UI
-      setUsuarios(usuarios.filter(user => user.id !== userId));
-
-      toast({
-        title: "Usuário excluído",
-        description: "O usuário foi removido com sucesso",
-      });
-      
-      // Recarregar a lista de usuários após a exclusão para garantir dados atualizados
-      const { data: updatedUsers, error: fetchError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-        
-      if (fetchError) {
-        console.error('Erro ao recarregar lista de usuários:', fetchError);
-      } else {
-        setUsuarios(updatedUsers || []);
-      }
-    } catch (error: any) {
-      console.error('Erro ao excluir usuário:', error);
-      toast({
-        title: "Erro ao excluir usuário",
-        description: error.message || "Ocorreu um erro ao excluir o usuário",
-        variant: "destructive",
-      });
-    } finally {
-      setActionLoading(false);
-    }
-  };
+  // Sync state with parent component
+  React.useEffect(() => {
+    setParentUsuarios(usuarios);
+  }, [usuarios, setParentUsuarios]);
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Gerenciar Usuários</CardTitle>
-          <CardDescription>
-            Lista de todos os usuários cadastrados no sistema
-          </CardDescription>
-        </div>
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <DialogTrigger asChild>
-            <Button className="flex items-center gap-2">
-              <UserPlus className="h-4 w-4" />
-              Novo Usuário
-            </Button>
-          </DialogTrigger>
-          <CreateUserDialog 
-            onSubmit={handleCriarUsuario}
-            onCancel={() => setOpenDialog(false)}
-            loading={actionLoading}
-          />
-        </Dialog>
-      </CardHeader>
+      <UserManagementHeader
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        onCreateUser={async (formData) => {
+          const success = await handleCriarUsuario(formData);
+          if (success) setOpenDialog(false);
+        }}
+        actionLoading={actionLoading}
+      />
       <CardContent>
         <UserTable 
           usuarios={usuarios}
@@ -237,7 +67,13 @@ export const UserManagement = ({ usuarios, loading, setUsuarios }: {
       <Dialog open={openResetDialog} onOpenChange={setOpenResetDialog}>
         <ResetPasswordDialog
           email={resetSenha.email}
-          onSubmit={handleResetarSenha}
+          onSubmit={async () => {
+            const success = await handleResetarSenha(resetSenha.email);
+            if (success) {
+              setResetSenha({ email: '', id: '' });
+              setOpenResetDialog(false);
+            }
+          }}
           onCancel={() => setOpenResetDialog(false)}
           loading={actionLoading}
         />
