@@ -32,7 +32,7 @@ const Parceiros = () => {
               <div className="w-full md:w-1/3">
                 <a href="https://www.ient.com.br" target="_blank" rel="noopener noreferrer">
                   <img
-                    src="/lovable-uploads/0825c09f-a0cf-48e1-aa35-5dd9639341cd.png"
+                    src="/lovable-uploads/6a444048-dc7f-4a9d-97a3-269edd5fcb79.png"
                     alt="Colégio Novos Tempos"
                     className="w-full h-auto hover:opacity-90 transition-opacity"
                   />
