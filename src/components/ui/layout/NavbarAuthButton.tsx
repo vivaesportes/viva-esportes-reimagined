@@ -17,6 +17,10 @@ const NavbarAuthButton = ({
 }: NavbarAuthButtonProps) => {
   console.log("NavbarAuthButton - isAuthenticated:", isAuthenticated, "profileName:", profileName);
   
+  // Função para verificar se estamos em ambiente de produção
+  const isProd = window.location.hostname === 'vivaesportes.com.br';
+  console.log("NavbarAuthButton - Ambiente de produção:", isProd);
+  
   return (
     <Link
       to={isAuthenticated ? "/painel" : "/login"}

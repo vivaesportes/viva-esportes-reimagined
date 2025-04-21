@@ -16,24 +16,49 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { isAuthenticated, profile } = useAuth();
   const [checandoAutenticacao, setChecandoAutenticacao] = useState(true);
+  const [forceShow, setForceShow] = useState(false);
 
   useEffect(() => {
     const verificarSessao = async () => {
       try {
+        console.log("Navbar - Verificando sessão atual...");
         const { data } = await supabase.auth.getSession();
         console.log("Navbar - Sessão atual:", data.session);
         setChecandoAutenticacao(false);
+        
+        // Se estamos em produção e não conseguimos carregar a sessão, ainda assim mostramos o botão
+        if (window.location.hostname === 'vivaesportes.com.br' && !data.session) {
+          console.log("Navbar - Em produção, forçando exibição do botão");
+          setForceShow(true);
+        }
       } catch (error) {
         console.error("Erro ao verificar sessão:", error);
         setChecandoAutenticacao(false);
+        // Em caso de erro, também forçamos a exibição do botão
+        setForceShow(true);
       }
     };
     
     verificarSessao();
+    
+    // Definir um timeout para garantir que o botão seja exibido mesmo em caso de problemas
+    const timer = setTimeout(() => {
+      if (checandoAutenticacao) {
+        console.log("Navbar - Timeout atingido, forçando exibição do botão");
+        setChecandoAutenticacao(false);
+        setForceShow(true);
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const closeMenu = () => setIsMenuOpen(false);
+
+  // Verifica se deve mostrar o botão de login
+  const shouldShowAuthButton = !checandoAutenticacao || forceShow;
+  console.log("Navbar - Deve mostrar botão:", shouldShowAuthButton);
 
   return (
     <nav className="bg-white fixed w-full top-0 left-0 z-50 shadow">
@@ -71,7 +96,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              {!checandoAutenticacao && (
+              {shouldShowAuthButton && (
                 <NavbarAuthButton
                   isAuthenticated={isAuthenticated}
                   profileName={profile?.nome?.split(' ')[0]}
