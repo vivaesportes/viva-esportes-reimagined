@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -30,17 +31,17 @@ const Hero = () => {
 
   const photos = [
     {
-      src: "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol, garoto vermelho
+      src: `${import.meta.env.BASE_URL || ''}lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png`, // futebol, garoto vermelho
       style: { objectPosition: "20% 40%" }, // ajustado para 20% horizontal e 40% vertical
       alt: "Foto Esporte Garoto Vermelho"
     },
     {
-      src: "/lovable-uploads/3da6317e-d0f9-4b9d-897b-2be6b599199a.png", // volei
+      src: `${import.meta.env.BASE_URL || ''}lovable-uploads/3da6317e-d0f9-4b9d-897b-2be6b599199a.png`, // volei
       style: { objectPosition: "center center" },
       alt: "Foto Esporte Volei"
     },
     {
-      src: "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas, ajustes para mostrar os professores
+      src: `${import.meta.env.BASE_URL || ''}lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png`, // instrutores/alunas, ajustes para mostrar os professores
       style: { objectPosition: "30% 25%" }, // Subir e centralizar mais para mostrar as duas pessoas
       alt: "Foto Esporte Professores"
     },

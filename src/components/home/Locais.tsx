@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import LocalCard from "./locais/LocalCard";
 import LocationsMap from "./locais/LocationsMap";
@@ -21,14 +22,14 @@ const Locais = () => {
       address:
         "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
       modalidades: allModalidades,
-      image: "/lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png",
+      image: `${import.meta.env.BASE_URL || ''}lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png`,
     },
     {
       id: 2,
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Ballet", "Futsal", "Vôlei"],
-      image: "/lovable-uploads/b50d3221-4c04-4d59-8f15-14faf47fd5d6.png",
+      image: `${import.meta.env.BASE_URL || ''}lovable-uploads/b50d3221-4c04-4d59-8f15-14faf47fd5d6.png`,
     },
   ];
 
