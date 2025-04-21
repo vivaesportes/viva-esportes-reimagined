@@ -5,12 +5,23 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
 const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
 
+// Configura as URLs com base no ambiente atual
+const getSiteUrl = () => {
+  const currentUrl = window.location.origin;
+  console.log("URL atual:", currentUrl);
+  return currentUrl;
+};
+
 // Cria o cliente Supabase com valores válidos e configurações explícitas para autenticação
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'implicit',
+    // Configura a URL de redirecionamento dinamicamente
+    redirectTo: getSiteUrl() + '/login'
   }
 });
 

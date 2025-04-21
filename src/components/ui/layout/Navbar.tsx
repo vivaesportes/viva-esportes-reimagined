@@ -1,15 +1,34 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
-import { Menu, X, LogIn } from "lucide-react";
+import { Menu, X, LogIn, User } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/auth/AuthContext";
+import { supabase } from "@/lib/supabase";
 
 const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
+  const [checandoAutenticacao, setChecandoAutenticacao] = useState(true);
+
+  useEffect(() => {
+    // Verifica a sessão ao carregar a página
+    const verificarSessao = async () => {
+      try {
+        const { data } = await supabase.auth.getSession();
+        console.log("Navbar - Sessão atual:", data.session);
+        setChecandoAutenticacao(false);
+      } catch (error) {
+        console.error("Erro ao verificar sessão:", error);
+        setChecandoAutenticacao(false);
+      }
+    };
+    
+    verificarSessao();
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -99,14 +118,25 @@ const Navbar = () => {
                       </Link>
                     </li>
                     <li className="mt-2">
-                      <Link
-                        to={isAuthenticated ? "/painel" : "/login"}
-                        className="flex items-center justify-center w-full border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full text-center transition-colors"
-                        onClick={closeMenu}
-                      >
-                        <LogIn className="mr-2 h-4 w-4" />
-                        {isAuthenticated ? "Área do Professor" : "Login"}
-                      </Link>
+                      {!checandoAutenticacao && (
+                        <Link
+                          to={isAuthenticated ? "/painel" : "/login"}
+                          className="flex items-center justify-center w-full border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full text-center transition-colors"
+                          onClick={closeMenu}
+                        >
+                          {isAuthenticated ? (
+                            <>
+                              <User className="mr-2 h-4 w-4" />
+                              {profile?.nome ? `Olá, ${profile.nome.split(' ')[0]}` : "Área do Professor"}
+                            </>
+                          ) : (
+                            <>
+                              <LogIn className="mr-2 h-4 w-4" />
+                              Login
+                            </>
+                          )}
+                        </Link>
+                      )}
                     </li>
                   </ul>
                 </div>
@@ -141,15 +171,26 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link
-                to={isAuthenticated ? "/painel" : "/login"}
-                className={`border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors ${
-                  location.pathname === "/login" || location.pathname === "/painel" ? "ring-2 ring-viva-red" : ""
-                }`}
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-                {isAuthenticated ? "Área do Professor" : "Login"}
-              </Link>
+              {!checandoAutenticacao && (
+                <Link
+                  to={isAuthenticated ? "/painel" : "/login"}
+                  className={`border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors ${
+                    location.pathname === "/login" || location.pathname === "/painel" ? "ring-2 ring-viva-red" : ""
+                  }`}
+                >
+                  {isAuthenticated ? (
+                    <>
+                      <User className="mr-2 h-4 w-4" />
+                      {profile?.nome ? `Olá, ${profile.nome.split(' ')[0]}` : "Área do Professor"}
+                    </>
+                  ) : (
+                    <>
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
+                    </>
+                  )}
+                </Link>
+              )}
             </li>
           </ul>
         )}

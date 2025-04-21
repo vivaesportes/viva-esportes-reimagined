@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { UserRole } from "@/contexts/auth/types";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -23,9 +23,32 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   const navigate = useNavigate();
   const [retrying, setRetrying] = useState(false);
   const [resetAttempted, setResetAttempted] = useState(false);
+  const [verificandoSessao, setVerificandoSessao] = useState(true);
   
   const { loadingTimeout, longLoadingTimeout } = useLoadingTimeout(loading);
   const { databaseCheck, checkingDatabase, checkProfileInDatabase } = useDatabaseCheck();
+
+  // Efeito para verificar a sessão atual ao montar o componente
+  useEffect(() => {
+    const verificarSessao = async () => {
+      try {
+        console.log("RotaProtegida - Verificando sessão atual...");
+        const { data } = await supabase.auth.getSession();
+        console.log("RotaProtegida - Sessão atual:", data.session);
+        
+        if (data.session && !isAuthenticated) {
+          console.log("RotaProtegida - Há uma sessão ativa, mas o estado não reflete isso. Forçando atualização...");
+          await retryProfileFetch();
+        }
+      } catch (error) {
+        console.error("RotaProtegida - Erro ao verificar sessão:", error);
+      } finally {
+        setVerificandoSessao(false);
+      }
+    };
+    
+    verificarSessao();
+  }, []);
 
   // Logs detalhados para debug
   console.log("RotaProtegida - Caminho atual:", location.pathname);
@@ -69,7 +92,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     return <SupabaseConfigCheck />;
   }
 
-  if (loading) {
+  if (loading || verificandoSessao) {
     return (
       <LoadingState
         loadingTimeout={loadingTimeout}
@@ -88,6 +111,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
 
   if (!isAuthenticated) {
     console.log("Usuário não autenticado, redirecionando para login");
+    // Salva a localização atual para redirecionar de volta após o login
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
