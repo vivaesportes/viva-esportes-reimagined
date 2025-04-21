@@ -88,7 +88,6 @@ const fadeUpVariants = {
 };
 
 const Hero = () => {
-  // Dados botão WhatsApp
   const whatsappNumber = "5531992901175";
   const whatsappMessage =
     "Olá! Gostaria de saber mais sobre matrículas na Viva Esportes.";
@@ -96,10 +95,17 @@ const Hero = () => {
     whatsappMessage
   )}`;
 
+  // Fotos das alunas (retornando as fotos que estavam antes)
+  const photos = [
+    "/placeholder.svg",
+    "/placeholder.svg",
+    "/placeholder.svg",
+  ];
+
   return (
-    <section className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#030B1E]">
-      {/* Fundo animado geométrico esportivo */}
-      <div className="absolute inset-0 bg-gradient-to-br from-viva-blue/70 via-viva-yellow/20 to-viva-red/10 blur-2xl" />
+    <section className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#010613]">
+      {/* Fundo animado geométrico esportivo ainda mais escuro */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-viva-blue/40 to-viva-red/30 blur-3xl" />
       <div className="absolute inset-0 overflow-hidden">
         <ElegantShape
           delay={0.2}
@@ -143,81 +149,100 @@ const Hero = () => {
         />
       </div>
       {/* Conteúdo principal: textos esportivos */}
-      <div className="relative z-10 container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-          {/* Badge esportivo animado */}
-          <motion.div
-            custom={0}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-            className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/10 border border-white/20 mb-8 md:mb-12 shadow-sm backdrop-blur"
+      <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center">
+        {/* Badge esportivo animado */}
+        <motion.div
+          custom={0}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/10 border border-white/20 mb-6 md:mb-10 shadow-sm backdrop-blur"
+        >
+          <Circle className="h-2 w-2 fill-viva-red/80" />
+          <span className="text-sm text-viva-yellow tracking-wider font-bold uppercase drop-shadow">
+            Viva sua energia!
+          </span>
+        </motion.div>
+        {/* Título com animação em branco */}
+        <motion.div
+          custom={1}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full max-w-4xl"
+        >
+          <h1 className="text-4xl sm:text-7xl md:text-8xl font-extrabold mb-5 md:mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
+            Esporte. <br />
+            Movimento. <br />
+            Vitória.
+          </h1>
+        </motion.div>
+
+        {/* Fotos das alunas */}
+        <motion.div
+          custom={2}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex gap-8 justify-center mb-12 mt-6"
+        >
+          {photos.map((src, i) => (
+            <motion.img 
+              key={i} 
+              src={src} 
+              alt={`Aluno ${i + 1}`} 
+              className="w-32 h-32 rounded-full object-cover border-4 border-viva-yellow shadow-lg"
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.8 + i * 0.3, duration: 0.8, ease: "easeOut" }}
+            />
+          ))}
+        </motion.div>
+
+        {/* Subtítulo com animação */}
+        <motion.div
+          custom={3}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="max-w-2xl"
+        >
+          <p className="text-base sm:text-lg md:text-2xl text-white/90 mb-8 leading-relaxed font-light tracking-wide">
+            Descubra mais energia, saúde e diversão a cada treino, torneio e desafio. Treine, vença, conquiste sua melhor versão com a Viva Esportes!
+          </p>
+        </motion.div>
+
+        {/* Botões de ação */}
+        <motion.div
+          custom={4}
+          variants={fadeUpVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col sm:flex-row gap-5 justify-center w-full mb-4"
+        >
+          <Button
+            asChild
+            size="lg"
+            className="bg-gradient-to-r from-viva-yellow to-viva-red text-viva-darkBlue font-bold px-9 py-5 rounded-full shadow-xl hover:scale-105 transition-all text-lg border-2 border-white hover:border-viva-red hover:bg-viva-red hover:text-white"
           >
-            <Circle className="h-2 w-2 fill-viva-red/80" />
-            <span className="text-sm text-viva-yellow tracking-wider font-bold uppercase drop-shadow">
-              Viva sua energia!
-            </span>
-          </motion.div>
-          {/* Título com animação gradient esportiva */}
-          <motion.div
-            custom={1}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-            className="w-full"
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+              Matricule-se agora
+              <ArrowRight className="inline-block ml-2" size={22} />
+            </a>
+          </Button>
+          <Button
+            variant="outline"
+            size="lg"
+            className="border-white text-white font-bold px-9 py-5 rounded-full hover-scale transition-all text-lg hover:bg-viva-blue/20 bg-white/10 flex items-center justify-center gap-3"
           >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold mb-5 md:mb-8 tracking-tight leading-tight drop-shadow-lg">
-              <span className="bg-clip-text text-transparent bg-gradient-to-b from-viva-yellow via-white to-viva-yellow/70">
-                Esporte.{" "}
-              </span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-viva-blue/90 via-viva-red/90 to-viva-yellow/80 animate-[pulse_7s_ease-in-out_infinite]">
-                Movimento. Vitória.
-              </span>
-            </h1>
-          </motion.div>
-          {/* Subtítulo com animação */}
-          <motion.div
-            custom={2}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <p className="text-base sm:text-lg md:text-2xl text-white/80 mb-8 leading-relaxed font-light tracking-wide max-w-xl mx-auto">
-              Descubra mais energia, saúde e diversão a cada treino, torneio e desafio. Treine, vença, conquiste sua melhor versão com a Viva Esportes!
-            </p>
-          </motion.div>
-          {/* Botões de ação */}
-          <motion.div
-            custom={3}
-            variants={fadeUpVariants}
-            initial="hidden"
-            animate="visible"
-            className="flex flex-col sm:flex-row gap-5 justify-center w-full mb-2"
-          >
-            <Button
-              asChild
-              size="lg"
-              className="bg-gradient-to-r from-viva-yellow to-viva-red text-viva-darkBlue font-bold px-9 py-5 rounded-full shadow-xl hover:scale-105 transition-all text-lg border-2 border-white hover:border-viva-red hover:bg-viva-red hover:text-white"
-            >
-              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                Matricule-se agora
-                <ArrowRight className="inline-block ml-2" size={22} />
-              </a>
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-white text-white font-bold px-9 py-5 rounded-full hover-scale transition-all text-lg hover:bg-viva-blue/20 bg-white/10 flex items-center justify-center gap-3"
-            >
-              <Link to="/modalidades">
-                Modalidades &nbsp; <span className="inline-block animate-bounce">🏅</span>
-              </Link>
-            </Button>
-          </motion.div>
-        </div>
+            <Link to="/modalidades">
+              Modalidades &nbsp; <span className="inline-block animate-bounce">🏅</span>
+            </Link>
+          </Button>
+        </motion.div>
       </div>
       {/* Degrade de overlay para dar profundidade */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#030B1E] via-transparent to-[#030B1E]/65 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#010613] via-transparent to-[#010613]/75 pointer-events-none" />
     </section>
   );
 };
