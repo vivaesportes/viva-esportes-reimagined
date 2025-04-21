@@ -1,3 +1,2 @@
 
-export { AuthProvider, useAuth } from './AuthProvider';
-export { default } from './AuthProvider';
+export { AuthProvider, useAuth, type AuthContextType, type UserProfile, type UserRole } from './AuthProvider';

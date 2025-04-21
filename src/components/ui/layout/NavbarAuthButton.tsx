@@ -1,31 +1,26 @@
 
 import { Link } from "react-router-dom";
 import { User, LogIn } from "lucide-react";
+import { useAuth } from "@/contexts/auth/AuthProvider";
 
 interface NavbarAuthButtonProps {
-  isAuthenticated: boolean;
-  profileName?: string;
   onClick?: () => void;
   className?: string;
 }
 
 const NavbarAuthButton = ({ 
-  isAuthenticated, 
-  profileName, 
   onClick,
   className = ""
 }: NavbarAuthButtonProps) => {
-  console.log("NavbarAuthButton - isAuthenticated:", isAuthenticated, "profileName:", profileName);
-  
-  // Função para verificar se estamos em ambiente de produção
-  const isProd = window.location.hostname === 'vivaesportes.com.br';
-  console.log("NavbarAuthButton - Ambiente de produção:", isProd);
+  const { isAuthenticated, profile } = useAuth();
+  const profileName = profile?.nome?.split(' ')[0];
   
   return (
     <Link
       to={isAuthenticated ? "/painel" : "/login"}
       className={`border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors ${className}`}
       onClick={onClick}
+      data-testid="auth-button"
     >
       {isAuthenticated ? (
         <>

@@ -1,16 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { UserRole } from "@/contexts/auth/types";
-import { isSupabaseConfigured } from "@/lib/supabase";
+import { Navigate, useLocation } from "react-router-dom";
+import { UserRole } from "@/contexts/auth/AuthProvider";
 import { Loader2 } from "lucide-react";
-import { useAuth } from "@/contexts/auth/AuthContext";
-import { supabase } from "@/lib/supabase";
-import { toast } from "@/hooks/use-toast";
-import { LoadingState } from "./LoadingState";
-import { SupabaseConfigCheck } from "./SupabaseConfigCheck";
-import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
-import { useDatabaseCheck } from "@/hooks/useDatabaseCheck";
+import { useAuth } from "@/contexts/auth/AuthProvider";
+import { Button } from "@/components/ui/button";
 
 interface RotaProtegidaProps {
   children: React.ReactNode;
@@ -18,109 +12,78 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch, resetAuthState, user } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, resetAuth } = useAuth();
   const location = useLocation();
-  const navigate = useNavigate();
-  const [retrying, setRetrying] = useState(false);
-  const [resetAttempted, setResetAttempted] = useState(false);
-  const [verificandoSessao, setVerificandoSessao] = useState(true);
-  
-  const { loadingTimeout, longLoadingTimeout } = useLoadingTimeout(loading);
-  const { databaseCheck, checkingDatabase, checkProfileInDatabase } = useDatabaseCheck();
+  const [showDebug, setShowDebug] = useState(false);
+  const [longWait, setLongWait] = useState(false);
 
-  // Efeito para verificar a sessão atual ao montar o componente
+  // Set a timeout to show additional UI if loading takes too long
   useEffect(() => {
-    const verificarSessao = async () => {
-      try {
-        console.log("RotaProtegida - Verificando sessão atual...");
-        console.log("URL atual:", window.location.href);
-        console.log("Hostname:", window.location.hostname);
-        
-        const { data } = await supabase.auth.getSession();
-        console.log("RotaProtegida - Sessão atual:", data.session);
-        
-        if (data.session && !isAuthenticated) {
-          console.log("RotaProtegida - Há uma sessão ativa, mas o estado não reflete isso. Forçando atualização...");
-          await retryProfileFetch();
-        }
-      } catch (error) {
-        console.error("RotaProtegida - Erro ao verificar sessão:", error);
-      } finally {
-        setVerificandoSessao(false);
+    const timer = setTimeout(() => {
+      if (loading) {
+        setLongWait(true);
       }
-    };
-    
-    verificarSessao();
-  }, []);
+    }, 3000);
 
-  // Logs detalhados para debug
-  console.log("RotaProtegida - Caminho atual:", location.pathname);
-  console.log("RotaProtegida - Perfil do usuário:", profile);
-  console.log("RotaProtegida - É admin?", isAdmin, "Role do perfil:", profile?.role);
-  console.log("RotaProtegida - Nível requerido:", nivelRequerido);
-  console.log("RotaProtegida - Loading:", loading, "Loading timeout:", loadingTimeout);
-  console.log("RotaProtegida - Erro de autenticação:", authError);
-  console.log("RotaProtegida - Reset tentado:", resetAttempted);
+    return () => clearTimeout(timer);
+  }, [loading]);
 
-  const handleRetry = async () => {
-    setRetrying(true);
-    try {
-      await retryProfileFetch();
-    } finally {
-      setRetrying(false);
-    }
-  };
+  // Debug info logging
+  useEffect(() => {
+    console.log("Protected Route - Auth state:", { 
+      isAuthenticated, 
+      profileRole: profile?.role,
+      isAdmin,
+      path: location.pathname
+    });
+  }, [isAuthenticated, profile, isAdmin, location]);
 
-  const handleReset = () => {
-    resetAuthState();
-    setResetAttempted(true);
-  };
-
-  const handleForceLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      toast({
-        title: "Logout forçado",
-        description: "Você foi desconectado. Por favor, faça login novamente.",
-      });
-      navigate('/login');
-    } catch (error) {
-      console.error("Erro ao forçar logout:", error);
-      navigate('/login');
-    }
-  };
-
-  // Verifica se o Supabase está configurado
-  if (!isSupabaseConfigured()) {
-    return <SupabaseConfigCheck />;
-  }
-
-  if (loading || verificandoSessao) {
+  if (loading) {
     return (
-      <LoadingState
-        loadingTimeout={loadingTimeout}
-        longLoadingTimeout={longLoadingTimeout}
-        retrying={retrying}
-        resetAttempted={resetAttempted}
-        onRetry={handleRetry}
-        onReset={handleReset}
-        onForceLogout={handleForceLogout}
-        authError={authError}
-        databaseCheck={databaseCheck}
-        checkingDatabase={checkingDatabase}
-      />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <Loader2 className="h-12 w-12 text-viva-blue animate-spin mb-4" />
+        <h2 className="text-xl font-bold mb-2">Verificando autenticação...</h2>
+        
+        {longWait && (
+          <div className="mt-8 max-w-md">
+            <p className="text-orange-600 mb-4">
+              Está demorando mais que o esperado. Isso pode ocorrer devido a problemas de conexão.
+            </p>
+            <div className="flex gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowDebug(!showDebug)}
+              >
+                {showDebug ? "Ocultar detalhes" : "Mostrar detalhes"}
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={resetAuth}
+              >
+                Resetar autenticação
+              </Button>
+            </div>
+            
+            {showDebug && (
+              <div className="mt-4 p-4 bg-gray-100 rounded-md text-xs font-mono overflow-auto max-h-64">
+                <p>Caminho: {location.pathname}</p>
+                <p>Autenticado: {isAuthenticated ? "Sim" : "Não"}</p>
+                <p>Admin: {isAdmin ? "Sim" : "Não"}</p>
+                <p>Perfil: {profile ? JSON.stringify(profile, null, 2) : "Não carregado"}</p>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     );
   }
 
   if (!isAuthenticated) {
-    console.log("Usuário não autenticado, redirecionando para login");
-    // Salva a localização atual para redirecionar de volta após o login
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (nivelRequerido === 'admin' && !isAdmin) {
     console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
-    console.error("Redirecionando para o painel do professor");
     return <Navigate to="/painel" replace />;
   }
 

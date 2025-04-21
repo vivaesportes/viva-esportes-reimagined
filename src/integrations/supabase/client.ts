@@ -6,7 +6,34 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
 
-// Import the supabase client like this:
-// import { supabase } from "@/integrations/supabase/client";
+// Public client configuration with explicit auth settings for reliability
+const supabaseOptions = {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    storage: localStorage
+  }
+};
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+// Export the supabase client with correct types and options
+export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, supabaseOptions);
+
+// Helper function to get the correct site URL for redirects
+export const getSiteUrl = () => {
+  // Production detection - add more domains as needed
+  const isProd = window.location.hostname === 'vivaesportes.com.br';
+  const productionUrl = 'https://vivaesportes.com.br';
+  
+  // Development or preview URL
+  const developmentUrl = window.location.origin;
+  
+  console.log("Environment detection:", { isProd, url: isProd ? productionUrl : developmentUrl });
+  return isProd ? productionUrl : developmentUrl;
+};
+
+// Get login redirect URL - used for auth providers that require redirects
+export const getLoginRedirectUrl = () => {
+  const baseUrl = getSiteUrl();
+  return `${baseUrl}/login`;
+};

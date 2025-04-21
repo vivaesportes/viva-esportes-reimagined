@@ -1,6 +1,6 @@
+
 import { useState, useEffect } from "react";
-import { useAuth } from '@/contexts/auth/AuthContext';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,60 +10,29 @@ import Layout from "@/components/ui/layout/Layout";
 import Logo from "@/components/ui/Logo";
 import { Loader2, Mail, Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth/AuthProvider";
 
 const Login = () => {
-  const { signIn, isAuthenticated, isAdmin, profile } = useAuth();
+  const { signIn, isAuthenticated, isAdmin, resetAuth } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-
-  // Estado para verificar se houve erro na autenticação
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const from = location.state?.from?.pathname || "/painel";
-
+  // Redirect if already authenticated
   useEffect(() => {
-    // Log detalhado para diagnóstico
-    console.log("Login - Estado de autenticação:", { 
-      isAuthenticated, 
-      isAdmin, 
-      profileRole: profile?.role,
-      from,
-      currentURL: window.location.href,
-      host: window.location.host,
-      origin: window.location.origin
-    });
+    console.log("Login page - Auth state:", { isAuthenticated, isAdmin });
     
-    // Verificar sessão atual manualmente
-    const checkCurrentSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      console.log("Sessão atual:", data.session);
-      
-      if (data.session) {
-        // Já existe uma sessão, mas o estado React pode não refletir isso
-        console.log("Sessão existente detectada, atualizando estado...");
-      }
-    };
-    
-    checkCurrentSession();
-    
-    // Redirecionar se já estiver autenticado
     if (isAuthenticated) {
-      console.log("Login - Usuário autenticado");
-      
       if (isAdmin) {
-        console.log("Login - Usuário é admin, redirecionando para /admin");
         navigate("/admin");
       } else {
-        console.log("Login - Usuário é professor, redirecionando para /painel");
         navigate("/painel");
       }
     }
-  }, [isAuthenticated, isAdmin, profile, navigate, from]);
+  }, [isAuthenticated, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,32 +40,30 @@ const Login = () => {
     setErrorMessage(null);
 
     try {
-      console.log("Login - Tentando login com:", email);
+      console.log("Attempting login with:", email);
       const { error } = await signIn(email, password);
       
       if (error) {
-        console.error("Erro no login:", error);
+        console.error("Login error:", error);
         setErrorMessage(error.message);
-        toast({
-          title: "Erro no login",
-          description: error.message,
-          variant: "destructive",
-        });
       } else {
-        console.log("Login bem-sucedido");
-        // O redirecionamento será feito pelo useEffect quando isAuthenticated for atualizado
+        console.log("Login successful");
+        // Redirect will happen in useEffect
       }
     } catch (error: any) {
-      console.error("Erro inesperado:", error);
+      console.error("Unexpected error:", error);
       setErrorMessage(error.message || "Ocorreu um erro inesperado");
-      toast({
-        title: "Erro no login",
-        description: error.message || "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResetAuth = async () => {
+    await resetAuth();
+    toast({
+      title: "Autenticação resetada",
+      description: "Por favor, tente fazer login novamente",
+    });
   };
 
   return (
@@ -186,8 +153,14 @@ const Login = () => {
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-center">
-              <p className="text-sm text-gray-500">
+            <CardFooter className="flex justify-between">
+              <button 
+                onClick={handleResetAuth} 
+                className="text-xs text-gray-500 hover:text-viva-blue"
+              >
+                Problemas com login?
+              </button>
+              <p className="text-xs text-gray-500">
                 Esqueceu sua senha? Entre em contato com o administrador.
               </p>
             </CardFooter>
