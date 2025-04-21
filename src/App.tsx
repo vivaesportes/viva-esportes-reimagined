@@ -1,23 +1,22 @@
-
+import React, { useEffect } from 'react';
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { isSupabaseConfigured } from "./lib/supabase";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import GaleriaBalletPascoa from "./pages/GaleriaBalletPascoa";
-import { useEffect } from "react";
 import Login from "./pages/auth/Login";
 import PainelProfessor from "./pages/auth/PainelProfessor";
 import PainelAdmin from "./pages/auth/PainelAdmin";
 import RotaProtegida from "./components/auth/RotaProtegida";
 import { AuthProvider } from "./contexts/AuthContext";
-import { isSupabaseConfigured } from "./lib/supabase";
+import PrimeiroAcesso from "./pages/auth/PrimeiroAcesso";
 
 const queryClient = new QueryClient();
 
-// Scroll to top on route change
 const ScrollToTop = () => {
   const { pathname } = useLocation();
   
@@ -30,7 +29,6 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  // Verifica se o Supabase está configurado e exibe um aviso no console
   useEffect(() => {
     if (!isSupabaseConfigured()) {
       console.warn('⚠️ As variáveis de ambiente do Supabase não estão configuradas. Para configurar corretamente acesse:');
@@ -53,16 +51,11 @@ const App = () => {
               <Route path="/locais" element={<Index />} />
               <Route path="/galeria" element={<Index />} />
               
-              {/* Template route for all gallery detail pages */}
               <Route path="/galeria/ballet-pascoa" element={<GaleriaBalletPascoa />} />
-              {/* Additional gallery detail pages will follow the same pattern:
-                  <Route path="/galeria/nome-da-galeria" element={<GaleriaNomeDaGaleria />} /> 
-              */}
               
               <Route path="/eventos" element={<Index />} />
               <Route path="/contato" element={<Index />} />
               
-              {/* Rotas de autenticação */}
               <Route path="/login" element={<Login />} />
               <Route 
                 path="/painel" 
@@ -81,7 +74,11 @@ const App = () => {
                 } 
               />
               
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route 
+                path="/primeiro-acesso" 
+                element={<PrimeiroAcesso />} 
+              />
+              
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
