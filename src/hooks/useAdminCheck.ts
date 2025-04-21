@@ -6,6 +6,7 @@ export const useAdminCheck = () => {
   const [adminExiste, setAdminExiste] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     const verificarAdmin = async () => {
@@ -22,6 +23,13 @@ export const useAdminCheck = () => {
         if (error) {
           console.error('Erro ao verificar admin:', error);
           setError(error.message);
+          
+          // Retry logic (max 3 attempts)
+          if (retryCount < 3) {
+            setTimeout(() => {
+              setRetryCount(prev => prev + 1);
+            }, 2000); // Wait 2 seconds before retry
+          }
           return;
         }
         
@@ -41,7 +49,7 @@ export const useAdminCheck = () => {
     };
 
     verificarAdmin();
-  }, []);
+  }, [retryCount]);
 
   return { adminExiste, loading, error };
 };

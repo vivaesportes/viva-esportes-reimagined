@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,10 +20,58 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
   const [senha, setSenha] = useState('');
   const [carregando, setCarregando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cooldown, setCooldown] = useState(false);
+  const [cooldownTimer, setCooldownTimer] = useState(0);
   const navigate = useNavigate();
+
+  // Handle cooldown timer if needed
+  useEffect(() => {
+    let interval: number | undefined;
+    
+    if (cooldown && cooldownTimer > 0) {
+      interval = setInterval(() => {
+        setCooldownTimer((prev) => {
+          if (prev <= 1) {
+            setCooldown(false);
+            clearInterval(interval);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000) as unknown as number;
+    }
+    
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [cooldown, cooldownTimer]);
+
+  const handleRateLimitError = (message: string) => {
+    // Extract the seconds from the error message if possible
+    const secondsMatch = message.match(/(\d+) second/);
+    let waitTime = 30; // Default fallback
+    
+    if (secondsMatch && secondsMatch[1]) {
+      waitTime = parseInt(secondsMatch[1], 10);
+    }
+    
+    setCooldown(true);
+    setCooldownTimer(waitTime);
+    setError(`Por favor, aguarde ${waitTime} segundos antes de tentar novamente.`);
+  };
 
   const criarPrimeiroAdmin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (cooldown) {
+      toast({
+        title: "Aguarde",
+        description: `Por favor, espere ${cooldownTimer} segundos antes de tentar novamente.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setCarregando(true);
     setError(null);
     
@@ -44,6 +92,14 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
 
       if (authError) {
         console.error("Erro na autenticação:", authError);
+        
+        // Handle rate limiting error
+        if (authError.message.includes("security purposes") || 
+            authError.code === "over_email_send_rate_limit") {
+          handleRateLimitError(authError.message);
+          return;
+        }
+        
         setError(authError.message);
         throw authError;
       }
@@ -100,14 +156,20 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
 
     } catch (error: any) {
       console.error('Erro ao criar admin:', error);
-      setError(error.message || "Ocorreu um erro inesperado");
-      toast({
-        title: "Erro ao criar usuário",
-        description: error.message || "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
+      
+      if (!cooldown) {
+        setError(error.message || "Ocorreu um erro inesperado");
+        
+        toast({
+          title: "Erro ao criar usuário",
+          description: error.message || "Ocorreu um erro inesperado",
+          variant: "destructive",
+        });
+      }
     } finally {
-      setCarregando(false);
+      if (!cooldown) {
+        setCarregando(false);
+      }
     }
   };
 
@@ -121,6 +183,16 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
         </Alert>
       )}
       
+      {cooldown && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Aguarde</AlertTitle>
+          <AlertDescription>
+            Você poderá tentar novamente em {cooldownTimer} segundos.
+          </AlertDescription>
+        </Alert>
+      )}
+      
       <div>
         <Label htmlFor="nome">Nome Completo</Label>
         <Input 
@@ -129,6 +201,7 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
           onChange={(e) => setNome(e.target.value)} 
           placeholder="Seu nome completo" 
           required 
+          disabled={cooldown || carregando}
         />
       </div>
       <div>
@@ -140,6 +213,7 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
           onChange={(e) => setEmail(e.target.value)} 
           placeholder="seu.email@exemplo.com" 
           required 
+          disabled={cooldown || carregando}
         />
       </div>
       <div>
@@ -152,17 +226,22 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
           placeholder="Senha de acesso" 
           required 
           minLength={6}
+          disabled={cooldown || carregando}
         />
       </div>
       <Button 
         type="submit" 
         className="w-full bg-viva-blue hover:bg-viva-darkBlue"
-        disabled={carregando}
+        disabled={carregando || cooldown}
       >
         {carregando ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             Criando...
+          </>
+        ) : cooldown ? (
+          <>
+            Aguarde {cooldownTimer}s...
           </>
         ) : (
           "Criar Conta de Administrador"
