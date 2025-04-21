@@ -84,7 +84,7 @@ const Contato = () => {
   };
 
   return (
-    <section className="py-20 bg-viva-gray">
+    <section id="contato" className="py-20 bg-viva-gray">
       <div className="container mx-auto px-4">
         <motion.div 
           className="text-center mb-16"

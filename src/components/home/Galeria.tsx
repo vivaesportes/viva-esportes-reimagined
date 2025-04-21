@@ -59,7 +59,7 @@ const Galeria = () => {
   };
 
   return (
-    <section className="py-20 bg-viva-gray relative overflow-hidden">
+    <section id="galeria" className="py-20 bg-viva-gray relative overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-white to-transparent"></div>
       
       <div className="container mx-auto px-4 relative z-10">
