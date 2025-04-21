@@ -1,4 +1,3 @@
-
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/AuthContext";
@@ -92,18 +91,6 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     }
     
     console.log("Usuário é admin, permitindo acesso à rota protegida");
-  }
-
-  // Verificação específica para rota /admin
-  if (location.pathname === "/admin") {
-    console.log("Tentativa de acesso ao caminho /admin");
-    
-    if (!isAdmin) {
-      console.error("Tentativa de acesso ao painel admin por usuário não-admin");
-      return <Navigate to="/painel" replace />;
-    }
-    
-    console.log("Usuário é admin, permitindo acesso ao painel admin");
   }
 
   return <>{children}</>;

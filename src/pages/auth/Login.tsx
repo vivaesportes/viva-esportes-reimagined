@@ -29,19 +29,20 @@ const Login = () => {
   useEffect(() => {
     // Redirecionar se já estiver autenticado
     if (isAuthenticated) {
-      console.log("Usuário autenticado, é admin?", isAdmin);
-      console.log("Role do usuário:", profile?.role);
+      console.log("Login - Usuário autenticado, é admin?", isAdmin);
+      console.log("Login - Role do usuário:", profile?.role);
+      console.log("Login - from:", from);
       
       // Redirecionar para o painel adequado baseado no role
       if (isAdmin) {
-        console.log("Redirecionando para o painel de admin");
+        console.log("Login - Redirecionando para o painel de admin");
         navigate("/admin");
       } else {
-        console.log("Redirecionando para o painel de professor");
+        console.log("Login - Redirecionando para o painel de professor");
         navigate("/painel");
       }
     }
-  }, [isAuthenticated, isAdmin, profile, navigate]);
+  }, [isAuthenticated, isAdmin, profile, navigate, from]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
