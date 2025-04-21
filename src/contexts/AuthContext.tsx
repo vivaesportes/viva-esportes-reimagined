@@ -144,9 +144,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error) {
         console.error("Erro durante o login:", error.message);
+        let mensagemErro = error.message;
+        
+        if (error.message === "Email not confirmed") {
+          mensagemErro = "Email não confirmado. Verifique sua caixa de entrada para confirmação.";
+        }
+        
         toast({
           title: "Erro ao fazer login",
-          description: error.message,
+          description: mensagemErro,
           variant: "destructive",
         });
         return { error, data: null };
@@ -206,6 +212,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   console.log("- Usuário:", user?.id);
   console.log("- Perfil:", profile);
   console.log("- É admin?", isAdmin);
+  console.log("- Role:", profile?.role);
   console.log("- Autenticado?", !!user);
 
   const value = {

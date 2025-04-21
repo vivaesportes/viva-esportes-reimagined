@@ -13,7 +13,7 @@ import { Loader2, Mail, Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const { signIn, isAuthenticated, isAdmin } = useAuth();
+  const { signIn, isAuthenticated, isAdmin, profile } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
@@ -30,14 +30,18 @@ const Login = () => {
     // Redirecionar se já estiver autenticado
     if (isAuthenticated) {
       console.log("Usuário autenticado, é admin?", isAdmin);
+      console.log("Role do usuário:", profile?.role);
+      
       // Redirecionar para o painel adequado baseado no role
       if (isAdmin) {
+        console.log("Redirecionando para o painel de admin");
         navigate("/admin");
       } else {
+        console.log("Redirecionando para o painel de professor");
         navigate("/painel");
       }
     }
-  }, [isAuthenticated, isAdmin, navigate]);
+  }, [isAuthenticated, isAdmin, profile, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

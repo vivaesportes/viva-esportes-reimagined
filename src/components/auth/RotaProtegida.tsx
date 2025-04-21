@@ -17,7 +17,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
 
   console.log("RotaProtegida - Caminho atual:", location.pathname);
   console.log("RotaProtegida - Perfil do usuário:", profile);
-  console.log("RotaProtegida - É admin?", isAdmin);
+  console.log("RotaProtegida - É admin?", isAdmin, "Role do perfil:", profile?.role);
   console.log("RotaProtegida - Nível requerido:", nivelRequerido);
 
   // Verifica se o Supabase está configurado
@@ -83,6 +83,13 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   // Rota que requer permissão de administrador
   if (nivelRequerido === 'admin' && !isAdmin) {
     console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
+    console.error("Redirecionando para o painel do professor");
+    return <Navigate to="/painel" replace />;
+  }
+
+  // Se a rota é /admin mas o usuário não é admin, redireciona para o painel de professor
+  if (location.pathname === "/admin" && !isAdmin) {
+    console.error("Tentativa de acesso ao painel admin por usuário não-admin");
     return <Navigate to="/painel" replace />;
   }
 

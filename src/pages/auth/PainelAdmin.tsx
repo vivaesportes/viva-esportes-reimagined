@@ -24,17 +24,23 @@ const PainelAdmin = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("PainelAdmin - Componente montado");
+    console.log("PainelAdmin - Perfil do usuário:", profile);
+    
     const carregarUsuarios = async () => {
       try {
         if (!profile?.id) return;
 
         setLoading(true);
+        console.log("PainelAdmin - Carregando usuários...");
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
+        console.log("PainelAdmin - Usuários carregados:", data);
         setUsuarios(data || []);
       } catch (error) {
         console.error('Erro ao carregar usuários:', error);
