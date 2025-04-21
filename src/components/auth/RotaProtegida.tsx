@@ -1,7 +1,7 @@
 
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/contexts/auth/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
-import { UserRole } from "@/contexts/AuthContext";
+import { UserRole } from "@/contexts/auth/types";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
