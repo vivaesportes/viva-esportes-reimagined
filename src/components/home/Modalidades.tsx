@@ -1,10 +1,11 @@
 
 import { motion } from "framer-motion";
-import { FaVolleyballBall, FaRunning } from "react-icons/fa";
+import { FaVolleyballBall } from "react-icons/fa";
 import { IoMdFitness } from "react-icons/io";
 import { PiSoccerBallFill } from "react-icons/pi";
 import { IoMusicalNotes } from "react-icons/io5";
 import { Card, CardContent } from "@/components/ui/card";
+import { Basketball, SoccerBall, MartialArts, Boxing } from "lucide-react";
 
 const Modalidades = () => {
   const modalidades = [
@@ -45,10 +46,31 @@ const Modalidades = () => {
     },
     {
       id: 6,
-      name: "Atletismo",
-      description: "Desenvolva velocidade, resistência e força física",
-      icon: FaRunning,
-      color: "bg-green-500",
+      name: "Basquete",
+      description: "Trabalhe agilidade, coordenação motora e espírito de equipe",
+      icon: Basketball,
+      color: "bg-yellow-500",
+    },
+    {
+      id: 7,
+      name: "Futebol Society",
+      description: "Pratique futebol em campo reduzido e desenvolva estratégias rápidas",
+      icon: SoccerBall,
+      color: "bg-green-600",
+    },
+    {
+      id: 8,
+      name: "Taekwondo",
+      description: "Disciplina, foco e autodefesa por meio das artes marciais",
+      icon: MartialArts,
+      color: "bg-blue-800",
+    },
+    {
+      id: 9,
+      name: "Muay-thai",
+      description: "Trabalhe condicionamento físico e autoconfiança com o boxe tailandês",
+      icon: Boxing,
+      color: "bg-red-600",
     },
   ];
 
