@@ -1,3 +1,4 @@
+
 import { useAuth } from "@/contexts/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/AuthContext";
@@ -80,7 +81,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Verificação específica para rotas de administrador
+  // Verificação específica para rotas que requerem nível admin
   if (nivelRequerido === 'admin') {
     console.log("Rota requer nível admin, verificando permissões...");
     

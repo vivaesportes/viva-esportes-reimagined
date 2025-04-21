@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,18 +27,23 @@ const Login = () => {
   const from = location.state?.from?.pathname || "/painel";
 
   useEffect(() => {
+    // Log detalhado para diagnóstico
+    console.log("Login - Estado de autenticação:", { 
+      isAuthenticated, 
+      isAdmin, 
+      profileRole: profile?.role,
+      from
+    });
+    
     // Redirecionar se já estiver autenticado
     if (isAuthenticated) {
-      console.log("Login - Usuário autenticado, é admin?", isAdmin);
-      console.log("Login - Role do usuário:", profile?.role);
-      console.log("Login - from:", from);
+      console.log("Login - Usuário autenticado");
       
-      // Redirecionar para o painel adequado baseado no role
       if (isAdmin) {
-        console.log("Login - Redirecionando para o painel de admin");
+        console.log("Login - Usuário é admin, redirecionando para /admin");
         navigate("/admin");
       } else {
-        console.log("Login - Redirecionando para o painel de professor");
+        console.log("Login - Usuário é professor, redirecionando para /painel");
         navigate("/painel");
       }
     }
@@ -50,14 +55,12 @@ const Login = () => {
     setErrorMessage(null);
 
     try {
+      console.log("Login - Tentando login com:", email);
       const { error } = await signIn(email, password);
+      
       if (error) {
         console.error("Erro no login:", error);
-        if (error.message === "Email not confirmed") {
-          setErrorMessage("Email não confirmado. Verifique sua caixa de entrada para confirmação.");
-        } else {
-          setErrorMessage(error.message);
-        }
+        setErrorMessage(error.message);
         toast({
           title: "Erro no login",
           description: error.message,

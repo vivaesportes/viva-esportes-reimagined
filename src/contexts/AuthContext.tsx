@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -201,15 +202,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // Calcula se o usuário é admin com base no perfil
+  // Calcula se o usuário é admin com base no perfil e adiciona validação extra
   const isAdmin = profile?.role === 'admin';
   
-  console.log("🔍 Estado atual de autenticação:");
-  console.log("- Usuário:", user?.id);
-  console.log("- Perfil:", profile);
-  console.log("- É admin?", isAdmin);
-  console.log("- Role:", profile?.role);
-  console.log("- Autenticado?", !!user);
+  // Log adicional para diagnóstico de problemas com o role
+  console.log("🔍 Estado atual de autenticação (isAdmin calculado):", {
+    userId: user?.id,
+    profileId: profile?.id,
+    profileRole: profile?.role,
+    calculatedIsAdmin: isAdmin,
+    authenticated: !!user
+  });
 
   const value = {
     session,
