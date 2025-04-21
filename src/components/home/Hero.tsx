@@ -31,7 +31,7 @@ const Hero = () => {
   const photos = [
     {
       src: "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol, garoto vermelho centralizado
-      style: { objectPosition: "30% 40%" }, // Ajustado para deslocar mais para a direita (horizontal)
+      style: { objectPosition: "60% 40%" }, // Mais à direita (horizontal)
       alt: "Foto Esporte Garoto Vermelho"
     },
     {
@@ -41,7 +41,7 @@ const Hero = () => {
     },
     {
       src: "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas, ajustes para mostrar os professores
-      style: { objectPosition: "center 50%" },
+      style: { objectPosition: "25% 60%" }, // Mais à esquerda e para baixo (vertical)
       alt: "Foto Esporte Professores"
     },
   ];
