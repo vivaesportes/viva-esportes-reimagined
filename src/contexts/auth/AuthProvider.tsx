@@ -15,12 +15,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     user,
     loading: authLoading,
     authError,
-    profile,
+    profile: stateProfile,
     setProfile,
     authInitialized
   } = useAuthState();
 
   const {
+    profile: profileFromHook,
     fetchProfile,
     profileError,
     profileLoading
@@ -29,18 +30,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const { databaseCheck, checkingDatabase, checkProfileInDatabase } = useDatabaseCheck();
   const { signIn, signOut } = useAuthActions();
 
+  // Use o perfil do estado ou do hook
+  const profile = stateProfile || profileFromHook;
+
   // Attempt to load profile when user is available
   useEffect(() => {
     let mounted = true;
     
     const loadUserProfile = async () => {
-      if (user?.id && !profile && authInitialized) {
+      if (user?.id && !profile && authInitialized && !profileLoading) {
         try {
           console.log("📝 Carregando perfil do usuário:", user.id);
           const profileData = await fetchProfile(user.id);
           
           if (mounted) {
             console.log("✅ Perfil carregado com sucesso:", profileData);
+            // Atualize o perfil no estado
+            setProfile(profileData);
           }
         } catch (err: any) {
           if (mounted) {
@@ -60,7 +66,33 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       mounted = false;
     };
-  }, [user?.id, profile, authInitialized, fetchProfile]);
+  }, [user?.id, profile, authInitialized, fetchProfile, profileLoading, setProfile]);
+
+  // Verifica se o usuário está autenticado mas sem perfil após um tempo
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    
+    if (user && !profile && !profileLoading && !authLoading) {
+      timeoutId = setTimeout(async () => {
+        console.log("⚠️ Usuário autenticado mas sem perfil após timeout. Tentando recuperar...");
+        try {
+          // Verifica conexão com o banco de dados
+          checkProfileInDatabase(user);
+          
+          // Tenta buscar o perfil novamente
+          const profileData = await fetchProfile(user.id);
+          setProfile(profileData);
+          console.log("✅ Perfil recuperado após timeout:", profileData);
+        } catch (error) {
+          console.error("❌ Não foi possível recuperar o perfil:", error);
+        }
+      }, 3000);
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [user, profile, profileLoading, authLoading, checkProfileInDatabase, fetchProfile, setProfile]);
 
   const resetAuthState = () => {
     setProfile(null);
@@ -77,6 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const profileData = await fetchProfile(user.id);
         console.log("✅ Perfil obtido com sucesso:", profileData);
+        setProfile(profileData);
+        
         toast({
           title: "Perfil recuperado",
           description: "Seu perfil foi carregado com sucesso.",
@@ -118,6 +152,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     databaseCheck,
     checkingDatabase
   };
+
+  // Logging para depuração
+  useEffect(() => {
+    console.log("AuthProvider state:", { 
+      isAuthenticated: !!user,
+      hasProfile: !!profile,
+      loading: authLoading || profileLoading,
+      authInitialized,
+      authError: authError || profileError
+    });
+  }, [user, profile, authLoading, profileLoading, authInitialized, authError, profileError]);
 
   // Only render children when auth is initialized to prevent flash of unprotected content
   if (!authInitialized) {

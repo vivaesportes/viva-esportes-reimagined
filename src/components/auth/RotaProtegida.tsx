@@ -39,14 +39,22 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
       profileRole: profile?.role,
       isAdmin,
       path: location.pathname,
-      loading
+      loading,
+      authError
     });
-  }, [isAuthenticated, profile, isAdmin, location, loading]);
+
+    // Se estiver autenticado mas não tiver perfil, tente buscar o perfil novamente
+    if (isAuthenticated && !profile && !loading && !retrying) {
+      console.log("Usuário autenticado mas sem perfil. Tentando buscar perfil...");
+      handleRetry();
+    }
+  }, [isAuthenticated, profile, isAdmin, location, loading, authError]);
 
   // Handlers for loading state actions
   const handleRetry = async () => {
     setRetrying(true);
     try {
+      console.log("Tentando recarregar perfil...");
       await retryProfileFetch();
     } catch (error) {
       console.error("Erro ao recarregar perfil:", error);
@@ -66,8 +74,8 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     window.location.href = '/login';
   };
 
-  // Check if we're in a loading state
-  if (loading) {
+  // Se estiver carregando ou verificando o banco de dados
+  if (loading || checkingDatabase) {
     return (
       <LoadingState
         loadingTimeout={loadingTimeout}
@@ -84,16 +92,18 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
-  // If authentication is complete but user is not authenticated, redirect to login
+  // Se não estiver autenticado após carregar, redirecione para login
   if (!isAuthenticated) {
+    console.log("Usuário não autenticado. Redirecionando para login.");
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // If authentication is complete and profile is missing, show loading state
+  // Se estiver autenticado mas não tiver perfil
   if (isAuthenticated && !profile) {
+    console.log("Usuário autenticado mas sem perfil. Exibindo estado de carregamento.");
     return (
       <LoadingState
-        loadingTimeout={loadingTimeout}
+        loadingTimeout={true}
         longLoadingTimeout={longLoadingTimeout}
         retrying={retrying}
         resetAttempted={resetAttempted}
@@ -107,7 +117,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
-  // Check if user has required role
+  // Verifica se o usuário tem o nível requerido
   if (nivelRequerido === 'admin' && !isAdmin) {
     console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
     return <Navigate to="/painel" replace />;
