@@ -41,7 +41,7 @@ const Hero = () => {
     },
     {
       src: "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas, ajustes para mostrar os professores
-      style: { objectPosition: "25% 60%" }, // Mais à esquerda e para baixo (vertical)
+      style: { objectPosition: "20% 35%" }, // Ajustado para subir e mais à esquerda para mostrar as duas pessoas melhor
       alt: "Foto Esporte Professores"
     },
   ];
