@@ -7,7 +7,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// Componente visual animado esportivo
+// Forma geométrica de fundo animada
 function ElegantShape({
   className,
   delay = 0,
@@ -27,8 +27,8 @@ function ElegantShape({
     <motion.div
       initial={{
         opacity: 0,
-        y: -120,
-        rotate: rotate - 12,
+        y: -150,
+        rotate: rotate - 15,
       }}
       animate={{
         opacity: 1,
@@ -38,17 +38,17 @@ function ElegantShape({
       transition={{
         duration: 2.2,
         delay,
-        ease: [0.25, 0.85, 0.42, 0.96],
+        ease: [0.25, 0.85, 0.41, 0.96],
         opacity: { duration: 1.2 },
       }}
       className={cn("absolute", className)}
     >
       <motion.div
         animate={{
-          y: [0, 25, 0],
+          y: [0, 18, 0],
         }}
         transition={{
-          duration: 10,
+          duration: 12,
           repeat: Number.POSITIVE_INFINITY,
           ease: "easeInOut",
         }}
@@ -63,10 +63,10 @@ function ElegantShape({
             "absolute inset-0 rounded-full",
             "bg-gradient-to-r to-transparent",
             gradient,
-            "backdrop-blur-[1.5px] border-2 border-white/[0.11]",
-            "shadow-[0_8px_32px_0_rgba(255,255,255,0.08)]",
+            "backdrop-blur-[2px] border-2 border-white/[0.15]",
+            "shadow-[0_8px_40px_0_rgba(0,0,0,0.17)]",
             "after:absolute after:inset-0 after:rounded-full",
-            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.12),transparent_72%)]"
+            "after:bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.18),transparent_63%)]"
           )}
         />
       </motion.div>
@@ -81,8 +81,8 @@ const fadeUpVariants = {
     y: 0,
     transition: {
       duration: 1,
-      delay: 0.6 + i * 0.23,
-      ease: [0.22, 0.6, 0.25, 1],
+      delay: 0.5 + i * 0.2,
+      ease: [0.25, 0.52, 0.25, 1],
     },
   }),
 };
@@ -95,111 +95,149 @@ const Hero = () => {
     whatsappMessage
   )}`;
 
-  // Fotos das alunas (retornando as fotos que estavam antes)
+  // Fotos
   const photos = [
-    "/placeholder.svg",
-    "/placeholder.svg",
-    "/placeholder.svg",
+    "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol
+    "/lovable-uploads/3da6317e-d0f9-4b9d-897b-2be6b599199a.png", // volei
+    "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas
   ];
 
   return (
-    <section className="relative min-h-[90vh] w-full flex items-center justify-center overflow-hidden bg-[#010613]">
-      {/* Fundo animado geométrico esportivo ainda mais escuro */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/90 via-viva-blue/40 to-viva-red/30 blur-3xl" />
-      <div className="absolute inset-0 overflow-hidden">
+    <section className="relative min-h-[95vh] w-full flex items-center justify-center overflow-hidden bg-[#01010a]">
+      {/* Fundo geométrico ainda mais escuro */}
+      <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-viva-blue/30 to-viva-darkBlue/70 blur-3xl" />
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <ElegantShape
-          delay={0.2}
-          width={520}
-          height={140}
-          rotate={13}
-          gradient="from-viva-yellow/[0.16]"
-          className="left-[-12vw] md:left-[-7vw] top-[10%] md:top-[18%]"
-        />
-        <ElegantShape
-          delay={0.5}
-          width={420}
-          height={120}
-          rotate={-12}
-          gradient="from-viva-red/[0.18]"
-          className="right-[-8vw] md:right-[2vw] top-[67%] md:top-[73%]"
-        />
-        <ElegantShape
-          delay={0.35}
-          width={270}
-          height={82}
-          rotate={-8}
-          gradient="from-viva-blue/[0.13]"
-          className="left-[7vw] md:left-[12vw] bottom-[3%] md:bottom-[14%]"
-        />
-        <ElegantShape
-          delay={0.5}
-          width={190}
-          height={60}
-          rotate={19}
+          delay={0.25}
+          width={640}
+          height={160}
+          rotate={14}
           gradient="from-viva-yellow/[0.14]"
-          className="right-[19vw] md:right-[24vw] top-[11%] md:top-[16%]"
+          className="left-[-12vw] md:left-[-10vw] top-[8%] md:top-[14%]"
         />
         <ElegantShape
-          delay={0.7}
-          width={120}
-          height={40}
-          rotate={-20}
-          gradient="from-viva-red/[0.15]"
-          className="left-[21vw] md:left-[29vw] top-[6%] md:top-[12%]"
+          delay={0.4}
+          width={480}
+          height={130}
+          rotate={-13}
+          gradient="from-viva-red/[0.22]"
+          className="right-[-7vw] md:right-[-2vw] top-[71%] md:top-[76%]"
+        />
+        <ElegantShape
+          delay={0.38}
+          width={340}
+          height={80}
+          rotate={-8}
+          gradient="from-viva-blue/[0.12]"
+          className="left-[12vw] md:left-[17vw] bottom-[7%] md:bottom-[17%]"
+        />
+        <ElegantShape
+          delay={0.55}
+          width={180}
+          height={60}
+          rotate={17}
+          gradient="from-viva-yellow/[0.13]"
+          className="right-[17vw] md:right-[21vw] top-[15%] md:top-[19%]"
+        />
+        <ElegantShape
+          delay={0.6}
+          width={125}
+          height={42}
+          rotate={-27}
+          gradient="from-viva-red/[0.17]"
+          className="left-[27vw] md:left-[33vw] top-[5%] md:top-[11%]"
         />
       </div>
-      {/* Conteúdo principal: textos esportivos */}
+      {/* Conteúdo principal */}
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center">
-        {/* Badge esportivo animado */}
+        {/* Badge animado */}
         <motion.div
           custom={0}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/10 border border-white/20 mb-6 md:mb-10 shadow-sm backdrop-blur"
+          className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-white/10 border border-white/20 mb-7 md:mb-10 shadow-sm backdrop-blur"
         >
           <Circle className="h-2 w-2 fill-viva-red/80" />
           <span className="text-sm text-viva-yellow tracking-wider font-bold uppercase drop-shadow">
             Viva sua energia!
           </span>
         </motion.div>
-        {/* Título com animação em branco */}
+        {/* Título animado em branco */}
         <motion.div
           custom={1}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-4xl"
+          className="w-full max-w-5xl"
         >
-          <h1 className="text-4xl sm:text-7xl md:text-8xl font-extrabold mb-5 md:mb-8 tracking-tight leading-tight drop-shadow-lg text-white">
-            Esporte. <br />
-            Movimento. <br />
-            Vitória.
+          <h1 className="text-4xl sm:text-7xl md:text-8xl font-extrabold mb-5 md:mb-10 tracking-tighter leading-tight drop-shadow-xl text-white select-none">
+            <motion.span
+              initial={{ opacity: 0, x: -90 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.75, duration: 0.8, type: "spring", stiffness: 60 }}
+              className="block"
+            >
+              Esporte.
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, x: 120 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1, duration: 0.8, type: "spring", stiffness: 50 }}
+              className="block"
+            >
+              Movimento.
+            </motion.span>
+            <motion.span
+              initial={{ opacity: 0, y: 70 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.85, type: "spring", stiffness: 54 }}
+              className="block"
+            >
+              Vitória.
+            </motion.span>
           </h1>
         </motion.div>
 
-        {/* Fotos das alunas */}
+        {/* Fotos animadas das alunas em círculos */}
         <motion.div
           custom={2}
           variants={fadeUpVariants}
           initial="hidden"
           animate="visible"
-          className="flex gap-8 justify-center mb-12 mt-6"
+          className="flex gap-8 justify-center mb-12 mt-4"
         >
           {photos.map((src, i) => (
-            <motion.img 
-              key={i} 
-              src={src} 
-              alt={`Aluno ${i + 1}`} 
-              className="w-32 h-32 rounded-full object-cover border-4 border-viva-yellow shadow-lg"
-              initial={{ scale: 0, opacity: 0 }}
+            <motion.div
+              key={i}
+              initial={{ scale: 0.5, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              transition={{ delay: 0.8 + i * 0.3, duration: 0.8, ease: "easeOut" }}
-            />
+              transition={{
+                delay: 1.6 + i * 0.28,
+                duration: 0.85,
+                ease: [0.23, 0.7, 0.45, 1],
+              }}
+              className="shadow-2xl"
+            >
+              <img 
+                src={src} 
+                alt={`Foto Esporte ${i + 1}`} 
+                className={cn(
+                  "w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-viva-yellow shadow-lg bg-black/30",
+                  "hover:scale-105 transition duration-300"
+                )}
+                style={{
+                  boxShadow:
+                    i === 1
+                      ? "0 0 0 8px rgba(255, 223, 71, 0.35)" // destaca a central
+                      : undefined,
+                }}
+              />
+            </motion.div>
           ))}
         </motion.div>
 
-        {/* Subtítulo com animação */}
+        {/* Subtítulo */}
         <motion.div
           custom={3}
           variants={fadeUpVariants}
@@ -207,11 +245,11 @@ const Hero = () => {
           animate="visible"
           className="max-w-2xl"
         >
-          <p className="text-base sm:text-lg md:text-2xl text-white/90 mb-8 leading-relaxed font-light tracking-wide">
-            Descubra mais energia, saúde e diversão a cada treino, torneio e desafio. Treine, vença, conquiste sua melhor versão com a Viva Esportes!
+          <p className="text-base sm:text-lg md:text-2xl text-white/85 mb-8 leading-relaxed font-light tracking-wide">
+            Descubra mais energia, saúde e diversão em cada treino, torneio e desafio.<br className="hidden md:inline" />
+            <span className="text-viva-yellow font-semibold"> Treine, vença, conquiste sua melhor versão com a Viva Esportes!</span>
           </p>
         </motion.div>
-
         {/* Botões de ação */}
         <motion.div
           custom={4}
@@ -233,16 +271,16 @@ const Hero = () => {
           <Button
             variant="outline"
             size="lg"
-            className="border-white text-white font-bold px-9 py-5 rounded-full hover-scale transition-all text-lg hover:bg-viva-blue/20 bg-white/10 flex items-center justify-center gap-3"
+            className="border-white text-white font-bold px-9 py-5 rounded-full hover-scale transition-all text-lg hover:bg-viva-blue/25 bg-white/10 flex items-center justify-center gap-3"
           >
             <Link to="/modalidades">
-              Modalidades &nbsp; <span className="inline-block animate-bounce">🏅</span>
+              Modalidades <span className="inline-block animate-bounce">🏅</span>
             </Link>
           </Button>
         </motion.div>
       </div>
-      {/* Degrade de overlay para dar profundidade */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#010613] via-transparent to-[#010613]/75 pointer-events-none" />
+      {/* Overlay degrade de profundidade */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#01010a] via-transparent to-[#01010a]/80 pointer-events-none" />
     </section>
   );
 };
