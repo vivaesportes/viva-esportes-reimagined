@@ -12,7 +12,7 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin } = useAuth();
 
   // Verifica se o Supabase está configurado
   const supabaseConfigured = isSupabaseConfigured();
@@ -72,8 +72,9 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Verificar nível de acesso, se necessário
-  if (nivelRequerido && profile?.role !== nivelRequerido) {
+  // Verifica explicitamente o nível de acesso quando é requisitado admin
+  if (nivelRequerido === 'admin' && !isAdmin) {
+    console.log("Acesso negado: Usuário não é admin. Redirecionando para /painel.");
     return <Navigate to="/painel" replace />;
   }
 

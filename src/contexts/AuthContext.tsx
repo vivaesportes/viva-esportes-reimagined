@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -91,6 +92,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async (userId: string) => {
     try {
+      console.log('Buscando perfil para o usuário ID:', userId);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -98,11 +101,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
+        console.error('Erro ao buscar perfil:', error.message);
         throw error;
       }
 
       if (data) {
+        console.log('Perfil encontrado:', data);
         setProfile(data as UserProfile);
+      } else {
+        console.warn('Nenhum perfil encontrado para o usuário ID:', userId);
       }
     } catch (error: any) {
       console.error('Erro ao buscar perfil:', error.message);
@@ -180,6 +187,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  // Calcula se o usuário é admin com base no perfil
+  const isAdmin = profile?.role === 'admin';
+
   const value = {
     session,
     user,
@@ -188,7 +198,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signOut,
     isAuthenticated: !!user,
-    isAdmin: profile?.role === 'admin',
+    isAdmin,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
