@@ -5,6 +5,7 @@ import { Circle, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import HeroPhotoCircles from "./HeroPhotoCircles";
 
 function ElegantShape({
   className,
@@ -203,38 +204,9 @@ const Hero = () => {
             </motion.span>
           </h1>
         </motion.div>
-        <motion.div
-          custom={2}
-          variants={fadeUpVariants}
-          initial="hidden"
-          animate="visible"
-          className="flex gap-8 justify-center mb-12 mt-4"
-        >
-          {photos.map(({src, style, alt}, i) => (
-            <motion.div
-              key={i}
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{
-                delay: 1.6 + i * 0.28,
-                duration: 0.85,
-                ease: [0.23, 0.7, 0.45, 1],
-              }}
-              className="shadow-2xl"
-            >
-              <img 
-                src={src} 
-                alt={alt}
-                style={style}
-                className={cn(
-                  "w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-viva-yellow shadow-lg bg-black/30",
-                  "hover:scale-105 transition duration-300"
-                )}
-                {...(i === 1 ? { style: {...style, boxShadow: "0 0 0 8px rgba(255, 223, 71, 0.35)"} } : {})}
-              />
-            </motion.div>
-          ))}
-        </motion.div>
+
+        <HeroPhotoCircles photos={photos} />
+
         <motion.div
           custom={3}
           variants={fadeUpVariants}
