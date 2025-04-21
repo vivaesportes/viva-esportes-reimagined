@@ -14,6 +14,7 @@ export const useAuthState = () => {
 
   useEffect(() => {
     let isMounted = true;
+    let authListener: { subscription: { unsubscribe: () => void } } | null = null;
     
     const initializeAuth = async () => {
       try {
@@ -22,7 +23,7 @@ export const useAuthState = () => {
         setAuthError(null);
         
         // First set up the auth state change listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+        authListener = supabase.auth.onAuthStateChange((event, currentSession) => {
           console.log('🔄 Evento de auth:', event, 'na URL:', window.location.href);
           
           if (isMounted) {
@@ -51,10 +52,6 @@ export const useAuthState = () => {
           setAuthInitialized(true);
           setLoading(false);
         }
-        
-        return () => {
-          subscription.unsubscribe();
-        };
       } catch (error: any) {
         console.error('❌ Erro ao carregar sessão inicial:', error);
         if (isMounted) {
@@ -69,6 +66,9 @@ export const useAuthState = () => {
 
     return () => {
       isMounted = false;
+      if (authListener) {
+        authListener.subscription.unsubscribe();
+      }
     };
   }, []);
 

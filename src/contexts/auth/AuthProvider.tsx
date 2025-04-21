@@ -1,5 +1,5 @@
 
-import React, { createContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { useAuthState } from './hooks/useAuthState';
 import { useProfile } from './hooks/useProfile';
 import { useAuthActions } from './hooks/useAuthActions';
@@ -60,9 +60,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       mounted = false;
     };
-  }, [user?.id, profile, authInitialized]);
+  }, [user?.id, profile, authInitialized, fetchProfile]);
 
   const resetAuthState = () => {
+    setProfile(null);
     signOut();
   };
 
@@ -118,12 +119,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkingDatabase
   };
 
+  // Only render children when auth is initialized to prevent flash of unprotected content
   if (!authInitialized) {
-    return null;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-pulse text-center">
+          <p className="text-gray-500">Inicializando autenticação...</p>
+        </div>
+      </div>
+    );
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-export { AuthContext };
-export const useAuth = () => React.useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

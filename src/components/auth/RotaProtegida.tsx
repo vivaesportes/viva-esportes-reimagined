@@ -67,7 +67,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   };
 
   // Check if we're in a loading state
-  if (loading || (isAuthenticated && !profile)) {
+  if (loading) {
     return (
       <LoadingState
         loadingTimeout={loadingTimeout}
@@ -84,10 +84,30 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
+  // If authentication is complete but user is not authenticated, redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
+  // If authentication is complete and profile is missing, show loading state
+  if (isAuthenticated && !profile) {
+    return (
+      <LoadingState
+        loadingTimeout={loadingTimeout}
+        longLoadingTimeout={longLoadingTimeout}
+        retrying={retrying}
+        resetAttempted={resetAttempted}
+        onRetry={handleRetry}
+        onReset={handleReset}
+        onForceLogout={handleForceLogout}
+        authError="Perfil de usuário não encontrado"
+        databaseCheck={databaseCheck}
+        checkingDatabase={checkingDatabase || false}
+      />
+    );
+  }
+
+  // Check if user has required role
   if (nivelRequerido === 'admin' && !isAdmin) {
     console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
     return <Navigate to="/painel" replace />;
