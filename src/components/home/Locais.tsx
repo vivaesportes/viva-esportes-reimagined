@@ -19,7 +19,7 @@ const Locais = () => {
       id: 1,
       name: "Colégio Novos Tempos",
       address:
-        "Av. Principal, 123 - Centro",
+        "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
       modalidades: allModalidades,
       image: "/lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png", // Original image for Colégio Novos Tempos
     },
@@ -28,7 +28,7 @@ const Locais = () => {
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Ballet", "Futsal", "Vôlei"],
-      image: "/lovable-uploads/8022a493-c6e5-44f4-8cd6-7189a2d031e3.png", // User uploaded image for Betim
+      image: "/lovable-uploads/03e4951d-c5d7-4b38-9f1b-06a3aa3ca031.png", // New user attached image for Betim
     },
   ];
 
