@@ -1,13 +1,12 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Plus, Loader2 } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { supabase } from '@/lib/supabase';
 import { CreateClassDialog } from './classes/CreateClassDialog';
 import { ClassCard } from './classes/ClassCard';
+import { useClassManagement } from '@/hooks/useClassManagement';
 
 interface Usuario {
   id: string;
@@ -27,46 +26,29 @@ interface Turma {
 }
 
 export const ClassManagement = ({ 
-  turmas, 
+  turmas: initialTurmas, 
   usuarios,
   turmasLoading,
-  setTurmas 
+  setTurmas: setTurmasGlobal 
 }: { 
   turmas: Turma[], 
   usuarios: Usuario[],
   turmasLoading: boolean,
   setTurmas: React.Dispatch<React.SetStateAction<Turma[]>>
 }) => {
-  const [openTurmaDialog, setOpenTurmaDialog] = useState(false);
+  const {
+    turmas,
+    openTurmaDialog,
+    setOpenTurmaDialog,
+    handleDeleteTurma,
+    handleEditTurma,
+    handleAddTurma
+  } = useClassManagement({ initialTurmas });
 
-  const handleDeleteTurma = async (id: string) => {
-    try {
-      const { error } = await supabase
-        .from('turmas')
-        .delete()
-        .eq('id', id);
-
-      if (error) throw error;
-
-      setTurmas(turmas.filter(t => t.id !== id));
-      toast({
-        title: "Turma excluída",
-        description: "A turma foi excluída com sucesso",
-      });
-    } catch (error: any) {
-      console.error('Erro ao excluir turma:', error);
-      toast({
-        title: "Erro ao excluir turma",
-        description: error.message || "Ocorreu um erro ao excluir a turma",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditTurma = (turma: Turma) => {
-    // TODO: Implementar edição de turma
-    console.log('Editar turma:', turma);
-  };
+  // Mantem o estado global sincronizado
+  React.useEffect(() => {
+    setTurmasGlobal(turmas);
+  }, [turmas, setTurmasGlobal]);
 
   return (
     <Card>
@@ -86,10 +68,7 @@ export const ClassManagement = ({
           </DialogTrigger>
           <CreateClassDialog
             usuarios={usuarios}
-            onSuccess={(newTurma) => {
-              setTurmas([...turmas, newTurma]);
-              setOpenTurmaDialog(false);
-            }}
+            onSuccess={handleAddTurma}
             onCancel={() => setOpenTurmaDialog(false)}
           />
         </Dialog>
