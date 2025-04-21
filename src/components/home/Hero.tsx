@@ -48,8 +48,13 @@ const Hero = () => {
               </Button>
               <Button
                 variant="outline"
-                className="border-white text-viva-red hover:bg-white/10 text-lg px-8 py-6 rounded-full"
+                className="border-white text-viva-red hover:bg-white/10 text-lg px-8 py-6 rounded-full flex items-center justify-center gap-2"
               >
+                <img
+                  src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
+                  alt="Logo Viva Esportes"
+                  className="w-6 h-6"
+                />
                 Conheça as Modalidades
               </Button>
             </div>
