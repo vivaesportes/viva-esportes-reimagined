@@ -1,3 +1,4 @@
+
 "use client";
 
 import { motion } from "framer-motion";
@@ -31,7 +32,7 @@ const Hero = () => {
   const photos = [
     {
       src: "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol, garoto vermelho centralizado
-      style: { objectPosition: "60% 40%" }, // Restore original position for the first photo
+      style: { objectPosition: "75% 40%" }, // Moved more to the right (horizontal)
       alt: "Foto Esporte Garoto Vermelho"
     },
     {
@@ -96,3 +97,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
