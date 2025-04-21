@@ -1,6 +1,6 @@
 
 import { serve } from 'std/server';
-import { createTransport } from 'nodemailer';
+import { createTransport } from 'https://esm.sh/nodemailer@6.9.9';
 
 const { GMAIL_USER, GMAIL_PASS } = Deno.env.toObject();
 
