@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Link } from "react-router-dom";
 import { isSupabaseConfigured } from "./lib/supabase";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -28,6 +28,33 @@ const ScrollToTop = () => {
   return null;
 };
 
+const DirectLinkNav = () => {
+  return (
+    <div className="fixed bottom-5 right-5 z-50 bg-slate-800 text-white p-4 rounded-lg shadow-lg">
+      <h3 className="mb-2 font-bold text-center border-b pb-1">Links Rápidos</h3>
+      <ul className="space-y-2">
+        <li>
+          <Link to="/" className="block hover:text-blue-300">Home</Link>
+        </li>
+        <li>
+          <Link to="/login" className="block hover:text-blue-300">Login</Link>
+        </li>
+        <li>
+          <Link to="/primeiro-acesso" className="block hover:text-blue-300 font-bold">
+            Primeiro Acesso Admin
+          </Link>
+        </li>
+        <li>
+          <Link to="/painel" className="block hover:text-blue-300">Painel Professor</Link>
+        </li>
+        <li>
+          <Link to="/admin" className="block hover:text-blue-300">Painel Admin</Link>
+        </li>
+      </ul>
+    </div>
+  );
+};
+
 const App = () => {
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -45,6 +72,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <ScrollToTop />
+            <DirectLinkNav />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/modalidades" element={<Index />} />
