@@ -4,8 +4,9 @@ import { FaVolleyballBall } from "react-icons/fa";
 import { IoMdFitness } from "react-icons/io";
 import { PiSoccerBallFill } from "react-icons/pi";
 import { IoMusicalNotes } from "react-icons/io5";
+import { IoIosBody } from "react-icons/io"; // Adicionado para Taekwondo
 import { Card, CardContent } from "@/components/ui/card";
-import { Activity, Dumbbell, Sword } from "lucide-react";
+import { Activity, Dumbbell } from "lucide-react";
 
 const Modalidades = () => {
   const modalidades = [
@@ -55,21 +56,21 @@ const Modalidades = () => {
       id: 7,
       name: "Futebol Society",
       description: "Pratique futebol em campo reduzido e desenvolva estratégias rápidas",
-      icon: Activity,
+      icon: PiSoccerBallFill, // Troca pelo ícone de bola de futebol
       color: "bg-green-600",
     },
     {
       id: 8,
       name: "Taekwondo",
       description: "Disciplina, foco e autodefesa por meio das artes marciais",
-      icon: Sword,
+      icon: IoIosBody, // Ícone de corpo humano chutando
       color: "bg-blue-800",
     },
     {
       id: 9,
       name: "Muay-thai",
       description: "Trabalhe condicionamento físico e autoconfiança com o boxe tailandês",
-      icon: Dumbbell,
+      icon: Dumbbell, // Mantém Dumbbell
       color: "bg-red-600",
     },
   ];
