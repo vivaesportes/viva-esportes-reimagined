@@ -1,4 +1,3 @@
-
 "use client";
 
 import { motion } from "framer-motion";
@@ -7,7 +6,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-// Forma geométrica de fundo animada
 function ElegantShape({
   className,
   delay = 0,
@@ -95,17 +93,27 @@ const Hero = () => {
     whatsappMessage
   )}`;
 
-  // Fotos
   const photos = [
-    "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol
-    "/lovable-uploads/3da6317e-d0f9-4b9d-897b-2be6b599199a.png", // volei
-    "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas
+    {
+      src: "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol, garoto vermelho centralizado
+      style: { objectPosition: "center 40%" },
+      alt: "Foto Esporte Garoto Vermelho"
+    },
+    {
+      src: "/lovable-uploads/3da6317e-d0f9-4b9d-897b-2be6b599199a.png", // volei
+      style: { objectPosition: "center center" },
+      alt: "Foto Esporte Volei"
+    },
+    {
+      src: "/lovable-uploads/05d28d2b-d738-4c5f-95e1-bef71d8408aa.png", // instrutores/alunas, ajustes para mostrar os professores
+      style: { objectPosition: "center 50%" },
+      alt: "Foto Esporte Professores"
+    },
   ];
 
   return (
-    <section className="relative min-h-[95vh] w-full flex items-center justify-center overflow-hidden bg-[#01010a]">
-      {/* Fundo geométrico ainda mais escuro */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-viva-blue/30 to-viva-darkBlue/70 blur-3xl" />
+    <section className="relative min-h-[95vh] w-full flex items-center justify-center overflow-hidden bg-[#00030a]">
+      <div className="absolute inset-0 bg-gradient-to-br from-black/95 via-viva-blue/20 to-viva-darkBlue/80 blur-3xl" />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <ElegantShape
           delay={0.25}
@@ -148,9 +156,7 @@ const Hero = () => {
           className="left-[27vw] md:left-[33vw] top-[5%] md:top-[11%]"
         />
       </div>
-      {/* Conteúdo principal */}
       <div className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center">
-        {/* Badge animado */}
         <motion.div
           custom={0}
           variants={fadeUpVariants}
@@ -163,7 +169,6 @@ const Hero = () => {
             Viva sua energia!
           </span>
         </motion.div>
-        {/* Título animado em branco */}
         <motion.div
           custom={1}
           variants={fadeUpVariants}
@@ -176,7 +181,7 @@ const Hero = () => {
               initial={{ opacity: 0, x: -90 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.75, duration: 0.8, type: "spring", stiffness: 60 }}
-              className="block"
+              className="block text-white"
             >
               Esporte.
             </motion.span>
@@ -184,7 +189,7 @@ const Hero = () => {
               initial={{ opacity: 0, x: 120 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 1, duration: 0.8, type: "spring", stiffness: 50 }}
-              className="block"
+              className="block text-white"
             >
               Movimento.
             </motion.span>
@@ -192,14 +197,12 @@ const Hero = () => {
               initial={{ opacity: 0, y: 70 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.2, duration: 0.85, type: "spring", stiffness: 54 }}
-              className="block"
+              className="block text-white"
             >
               Vitória.
             </motion.span>
           </h1>
         </motion.div>
-
-        {/* Fotos animadas das alunas em círculos */}
         <motion.div
           custom={2}
           variants={fadeUpVariants}
@@ -207,7 +210,7 @@ const Hero = () => {
           animate="visible"
           className="flex gap-8 justify-center mb-12 mt-4"
         >
-          {photos.map((src, i) => (
+          {photos.map(({src, style, alt}, i) => (
             <motion.div
               key={i}
               initial={{ scale: 0.5, opacity: 0 }}
@@ -221,23 +224,17 @@ const Hero = () => {
             >
               <img 
                 src={src} 
-                alt={`Foto Esporte ${i + 1}`} 
+                alt={alt}
+                style={style}
                 className={cn(
                   "w-32 h-32 md:w-40 md:h-40 rounded-full object-cover border-4 border-viva-yellow shadow-lg bg-black/30",
                   "hover:scale-105 transition duration-300"
                 )}
-                style={{
-                  boxShadow:
-                    i === 1
-                      ? "0 0 0 8px rgba(255, 223, 71, 0.35)" // destaca a central
-                      : undefined,
-                }}
+                {...(i === 1 ? { style: {...style, boxShadow: "0 0 0 8px rgba(255, 223, 71, 0.35)"} } : {})}
               />
             </motion.div>
           ))}
         </motion.div>
-
-        {/* Subtítulo */}
         <motion.div
           custom={3}
           variants={fadeUpVariants}
@@ -250,7 +247,6 @@ const Hero = () => {
             <span className="text-viva-yellow font-semibold"> Treine, vença, conquiste sua melhor versão com a Viva Esportes!</span>
           </p>
         </motion.div>
-        {/* Botões de ação */}
         <motion.div
           custom={4}
           variants={fadeUpVariants}
@@ -279,7 +275,6 @@ const Hero = () => {
           </Button>
         </motion.div>
       </div>
-      {/* Overlay degrade de profundidade */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#01010a] via-transparent to-[#01010a]/80 pointer-events-none" />
     </section>
   );
