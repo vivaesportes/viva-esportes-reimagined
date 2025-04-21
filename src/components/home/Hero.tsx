@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom"; // Added import for Link
 
 const Hero = () => {
   const scrollToNextSection = () => {
@@ -105,3 +106,4 @@ const Hero = () => {
 };
 
 export default Hero;
+
