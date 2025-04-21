@@ -20,10 +20,20 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     autoRefreshToken: true,
     detectSessionInUrl: true,
     flowType: 'implicit',
-    // Configura a URL de redirecionamento dinamicamente
-    redirectTo: getSiteUrl() + '/login'
   }
 });
+
+// Adiciona uma função para configurar o site de redirecionamento
+export const getRedirectUrl = () => {
+  return `${getSiteUrl()}/login`;
+};
+
+// Função para usar no processo de login
+export const getLoginRedirectOptions = () => {
+  return {
+    redirectTo: getRedirectUrl()
+  };
+};
 
 // Adiciona uma função para verificar se o Supabase está configurado corretamente
 export const isSupabaseConfigured = () => {

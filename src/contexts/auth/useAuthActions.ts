@@ -1,5 +1,5 @@
 
-import { supabase } from '@/lib/supabase';
+import { supabase, getLoginRedirectOptions } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 
@@ -16,6 +16,7 @@ export const useAuthActions = () => {
       }
 
       console.log("Tentando login com e-mail:", email);
+      // Não estamos usando a opção redirectTo aqui no login com senha
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

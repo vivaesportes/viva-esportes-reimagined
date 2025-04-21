@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { useNavigate, useLocation } from "react-router-dom";
@@ -34,7 +33,9 @@ const Login = () => {
       isAdmin, 
       profileRole: profile?.role,
       from,
-      currentURL: window.location.href
+      currentURL: window.location.href,
+      host: window.location.host,
+      origin: window.location.origin
     });
     
     // Verificar sessão atual manualmente
