@@ -45,7 +45,7 @@ const Sobre = () => {
               <span className="text-viva-red">Esportes</span>
             </h2>
             <p className="text-lg text-gray-600 mb-6">
-              Desde 2010, a Viva Esportes tem se dedicado a oferecer atividades esportivas e artísticas de qualidade para crianças e adolescentes.
+              Desde 2011, a Viva Esportes tem se dedicado a oferecer atividades esportivas e artísticas de qualidade para crianças e adolescentes.
             </p>
             <p className="text-lg text-gray-600 mb-8">
               Nossa missão é contribuir para o desenvolvimento integral dos alunos, promovendo saúde, bem-estar, socialização e valores como respeito, disciplina e trabalho em equipe.
