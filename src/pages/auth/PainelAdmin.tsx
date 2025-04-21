@@ -1,10 +1,9 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 import PainelLayout from '@/components/auth/PainelLayout';
-import { ShieldCheck, Users, BookOpen, Settings } from 'lucide-react'; // Added missing icon imports
+import { ShieldCheck, Users, BookOpen, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
