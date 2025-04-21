@@ -11,6 +11,11 @@ const Hero = () => {
     });
   };
 
+  // WhatsApp data for the Matricule-se button
+  const whatsappNumber = "5531992901175";
+  const whatsappMessage = "Olá! Gostaria de saber mais sobre matrículas na Viva Esportes.";
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
+
   return (
     <section className="relative h-screen flex items-center overflow-hidden bg-gradient-to-br from-viva-blue to-viva-darkBlue">
       {/* Background Elements */}
@@ -43,14 +48,19 @@ const Hero = () => {
               Formando atletas e cidadãos através da prática esportiva
             </p>
             <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center md:justify-start">
-              <Button className="bg-viva-red hover:bg-viva-darkRed text-white text-lg px-8 py-6 rounded-full">
-                Matricule-se
+              <Button 
+                asChild
+                className="bg-viva-red hover:bg-viva-darkRed text-white text-lg px-8 py-6 rounded-full"
+              >
+                <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  Matricule-se
+                </a>
               </Button>
               <Button
                 variant="outline"
                 className="border-white text-viva-red hover:bg-white/10 text-lg px-8 py-6 rounded-full flex items-center justify-center gap-2"
               >
-                Conheça as Modalidades
+                <Link to="/modalidades">Conheça as Modalidades</Link>
               </Button>
             </div>
           </motion.div>
@@ -95,4 +105,3 @@ const Hero = () => {
 };
 
 export default Hero;
-

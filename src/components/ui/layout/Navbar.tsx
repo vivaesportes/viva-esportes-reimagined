@@ -32,9 +32,10 @@ const Navbar = () => {
     { title: "Contato", path: "/contato" },
   ];
 
-  // Update WhatsApp number for Matricule-se button
-  const whatsappNumber = "31992901175";
-  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+  // Update WhatsApp number for Matricule-se button with international format
+  const whatsappNumber = "5531992901175";
+  const whatsappMessage = "Olá! Gostaria de saber mais sobre matrículas na Viva Esportes.";
+  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
 
   return (
     <nav

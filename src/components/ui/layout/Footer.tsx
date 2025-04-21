@@ -17,10 +17,10 @@ const Footer = () => {
               transformar vidas e construir um futuro melhor para nossas crianças e adolescentes.
             </p>
             <div className="flex space-x-4">
-              <a href="https://facebook.com" className="hover:text-viva-yellow transition-colors">
+              <a href="https://www.facebook.com/VivaEsportesOficial" target="_blank" rel="noopener noreferrer" className="hover:text-viva-yellow transition-colors">
                 <Facebook size={20} />
               </a>
-              <a href="https://instagram.com" className="hover:text-viva-yellow transition-colors">
+              <a href="https://www.instagram.com/vivaesportes" target="_blank" rel="noopener noreferrer" className="hover:text-viva-yellow transition-colors">
                 <Instagram size={20} />
               </a>
               <a href="https://twitter.com" className="hover:text-viva-yellow transition-colors">
@@ -97,4 +97,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
