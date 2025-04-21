@@ -72,7 +72,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-2">
                 <MapPin size={20} className="text-viva-yellow" />
-                <span className="text-gray-200">Av. Principal, 123 - Centro</span>
+                <span className="text-gray-200">Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone size={20} className="text-viva-yellow" />
@@ -80,7 +80,7 @@ const Footer = () => {
               </li>
               <li className="flex items-center space-x-2">
                 <Mail size={20} className="text-viva-yellow" />
-                <span className="text-gray-200">contato@vivaesportes.com.br</span>
+                <span className="text-gray-200">esportesviva@gmail.com</span>
               </li>
             </ul>
           </div>
@@ -97,3 +97,4 @@ const Footer = () => {
 };
 
 export default Footer;
+
