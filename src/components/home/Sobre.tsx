@@ -54,7 +54,7 @@ const Sobre = () => {
               <p className="italic text-gray-700">
                 "Acreditamos no poder transformador do esporte na vida das crianças e adolescentes, formando não apenas atletas, mas cidadãos preparados para os desafios da vida."
               </p>
-              <p className="font-bold mt-2">Ricardo Oliveira, Fundador</p>
+              <p className="font-bold mt-2">Carlos Diniz, Fundador</p>
             </div>
           </motion.div>
 
