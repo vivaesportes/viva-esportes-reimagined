@@ -3,108 +3,164 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import PainelLayout from '@/components/auth/PainelLayout';
+import { Users, UserPlus, Settings } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2 } from 'lucide-react';
 
-const PrimeiroAcesso = () => {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+interface Usuario {
+  id: string;
+  email: string;
+  nome: string;
+  role: string;
+  created_at: string;
+}
 
-  const criarPrimeiroAdmin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // 1. Criar usuário na autenticação
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password: senha,
-      });
+const PainelAdmin = () => {
+  const { profile } = useAuth();
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [loading, setLoading] = useState(true);
 
-      if (authError) throw authError;
-      
-      if (!authData.user) {
-        throw new Error("Erro ao criar usuário");
-      }
+  useEffect(() => {
+    const carregarUsuarios = async () => {
+      try {
+        if (!profile?.id) return;
 
-      // 2. Criar o perfil com role de admin
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: authData.user.id,
-          email,
-          nome,
-          role: 'admin',
-          created_at: new Date().toISOString(),
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        setUsuarios(data || []);
+      } catch (error) {
+        console.error('Erro ao carregar usuários:', error);
+        toast({
+          title: "Erro ao carregar usuários",
+          description: "Não foi possível carregar a lista de usuários",
+          variant: "destructive",
         });
+      } finally {
+        setLoading(false);
+      }
+    };
 
-      if (profileError) throw profileError;
+    carregarUsuarios();
+  }, [profile?.id]);
 
-      toast({
-        title: "Usuário Administrador Criado",
-        description: "Faça login com suas novas credenciais",
-      });
-
-    } catch (error: any) {
-      console.error('Erro ao criar admin:', error);
-      toast({
-        title: "Erro ao criar usuário",
-        description: error.message || "Ocorreu um erro inesperado",
-        variant: "destructive",
-      });
-    }
-  };
+  if (!profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-viva-blue" />
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Primeiro Acesso - Administrador</CardTitle>
-          <CardDescription>
-            Crie sua conta de administrador inicial
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={criarPrimeiroAdmin} className="space-y-4">
-            <div>
-              <Label>Nome Completo</Label>
-              <Input 
-                value={nome} 
-                onChange={(e) => setNome(e.target.value)} 
-                placeholder="Seu nome completo" 
-                required 
-              />
-            </div>
-            <div>
-              <Label>E-mail</Label>
-              <Input 
-                type="email" 
-                value={email} 
-                onChange={(e) => setEmail(e.target.value)} 
-                placeholder="seu.email@exemplo.com" 
-                required 
-              />
-            </div>
-            <div>
-              <Label>Senha</Label>
-              <Input 
-                type="password" 
-                value={senha} 
-                onChange={(e) => setSenha(e.target.value)} 
-                placeholder="Senha de acesso" 
-                required 
-              />
-            </div>
-            <Button type="submit" className="w-full">
-              Criar Conta de Administrador
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
-    </div>
+    <PainelLayout>
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold mb-2">Painel de Administração</h1>
+        <p className="text-gray-500">Gerencie usuários e configurações do sistema</p>
+      </div>
+
+      <Tabs defaultValue="usuarios" className="w-full">
+        <TabsList className="mb-8">
+          <TabsTrigger value="usuarios" className="flex items-center">
+            <Users className="mr-2 h-4 w-4" />
+            Usuários
+          </TabsTrigger>
+          <TabsTrigger value="config" className="flex items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            Configurações
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="usuarios">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <div>
+                <CardTitle>Gerenciar Usuários</CardTitle>
+                <CardDescription>
+                  Lista de todos os usuários cadastrados no sistema
+                </CardDescription>
+              </div>
+              <Button className="flex items-center gap-2">
+                <UserPlus className="h-4 w-4" />
+                Novo Usuário
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-viva-blue" />
+                </div>
+              ) : usuarios.length === 0 ? (
+                <div className="text-center py-8 text-gray-500">
+                  Nenhum usuário encontrado no sistema.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-50 border-b">
+                        <th className="py-3 px-4 text-left font-medium text-gray-500">Nome</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-500">Email</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-500">Função</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-500">Criado em</th>
+                        <th className="py-3 px-4 text-left font-medium text-gray-500">Ações</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usuarios.map((usuario) => (
+                        <tr key={usuario.id} className="border-b hover:bg-gray-50">
+                          <td className="py-3 px-4">{usuario.nome}</td>
+                          <td className="py-3 px-4">{usuario.email}</td>
+                          <td className="py-3 px-4">
+                            <span className={`px-2 py-1 rounded-full text-xs ${
+                              usuario.role === 'admin' 
+                                ? 'bg-purple-100 text-purple-800' 
+                                : 'bg-blue-100 text-blue-800'
+                            }`}>
+                              {usuario.role === 'admin' ? 'Administrador' : 'Professor'}
+                            </span>
+                          </td>
+                          <td className="py-3 px-4">
+                            {new Date(usuario.created_at).toLocaleDateString('pt-BR')}
+                          </td>
+                          <td className="py-3 px-4">
+                            <Button variant="outline" size="sm">
+                              Editar
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="config">
+          <Card>
+            <CardHeader>
+              <CardTitle>Configurações do Sistema</CardTitle>
+              <CardDescription>
+                Configurações gerais para a plataforma
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-500">Configurações serão implementadas em breve.</p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </PainelLayout>
   );
 };
 
-export default PrimeiroAcesso;
+export default PainelAdmin;
