@@ -12,7 +12,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative h-screen flex items-center overflow-hidden bg-gradient-to-br from-viva-red to-viva-darkBlue">
+    <section className="relative h-screen flex items-center overflow-hidden bg-gradient-to-br from-viva-blue to-viva-darkBlue">
       {/* Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-viva-red opacity-20"></div>
