@@ -1,75 +1,82 @@
 
-import { useRef, useEffect, useState } from "react";
-import mapboxgl from "mapbox-gl";
-import "mapbox-gl/dist/mapbox-gl.css";
+import { useState } from "react";
+import { GoogleMap, LoadScript, Marker, InfoWindow } from "@react-google-maps/api";
 
 const locations = [
   {
     name: "Viva Esportes Novos Tempos",
-    coordinates: [-44.2012, -20.0273],
+    position: { lat: -20.0273, lng: -44.2012 },
     description: "Unidade Novos Tempos",
   },
   {
     name: "Viva Esportes Betim",
-    coordinates: [-44.1978, -19.9678],
+    position: { lat: -19.9678, lng: -44.1978 },
     description: "Unidade Betim",
   },
 ];
 
+const mapContainerStyle = {
+  width: "100%",
+  height: "400px",
+  borderRadius: "0.5rem",
+};
+
+const center = {
+  lat: -19.9975,
+  lng: -44.1995,
+};
+
 const LocationsMap = () => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const [mapboxToken, setMapboxToken] = useState("");
-
-  useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
-
-    mapboxgl.accessToken = mapboxToken;
-
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: "mapbox://styles/mapbox/streets-v12",
-      center: [-44.1995, -19.9975],
-      zoom: 11,
-    });
-
-    map.current.addControl(new mapboxgl.NavigationControl(), "top-right");
-
-    locations.forEach((location) => {
-      const marker = new mapboxgl.Marker({ color: "#E83A45" })
-        .setLngLat(location.coordinates)
-        .setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(
-            `<h3 class="font-bold">${location.name}</h3><p>${location.description}</p>`
-          )
-        )
-        .addTo(map.current!);
-    });
-
-    return () => {
-      map.current?.remove();
-    };
-  }, [mapboxToken]);
+  const [selectedLocation, setSelectedLocation] = useState<(typeof locations)[0] | null>(null);
+  const [googleApiKey, setGoogleApiKey] = useState("");
 
   return (
     <div className="w-full">
-      {!mapboxToken ? (
+      {!googleApiKey ? (
         <div className="text-center p-4">
           <input
             type="text"
-            placeholder="Cole seu token público do Mapbox aqui"
+            placeholder="Cole sua API key do Google Maps aqui"
             className="w-full max-w-md p-2 border rounded"
-            onChange={(e) => setMapboxToken(e.target.value)}
+            onChange={(e) => setGoogleApiKey(e.target.value)}
           />
           <p className="text-sm text-gray-500 mt-2">
-            Visite mapbox.com para obter seu token público gratuito
+            Visite console.cloud.google.com para obter sua API key do Google Maps
           </p>
         </div>
-      ) : null}
-      <div
-        ref={mapContainer}
-        className="w-full h-[400px] rounded-lg shadow-lg"
-      />
+      ) : (
+        <LoadScript googleMapsApiKey={googleApiKey}>
+          <GoogleMap
+            mapContainerStyle={mapContainerStyle}
+            center={center}
+            zoom={11}
+            options={{
+              streetViewControl: false,
+              mapTypeControl: false,
+            }}
+          >
+            {locations.map((location) => (
+              <Marker
+                key={location.name}
+                position={location.position}
+                onClick={() => setSelectedLocation(location)}
+              />
+            ))}
+
+            {selectedLocation && (
+              <InfoWindow
+                position={selectedLocation.position}
+                onCloseClick={() => setSelectedLocation(null)}
+              >
+                <div>
+                  <h3 className="font-bold">{selectedLocation.name}</h3>
+                  <p>{selectedLocation.description}</p>
+                </div>
+              </InfoWindow>
+            )}
+          </GoogleMap>
+        </LoadScript>
+      )}
     </div>
   );
 };
