@@ -13,15 +13,8 @@ const Locais = () => {
     },
     {
       id: 2,
-      name: "Espaço Cultural Arte & Vida",
-      address: "Rua das Flores, 456 - Jardim Europa",
-      modalidades: ["Ballet", "Jazz"],
-      image: "/placeholder.svg"
-    },
-    {
-      id: 3,
-      name: "Centro Esportivo Municipal",
-      address: "Alameda dos Esportes, 789 - Parque das Águas",
+      name: "Colégio Novos Tempos - Betim",
+      address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Futsal", "Vôlei", "Atletismo", "Funcional"],
       image: "/placeholder.svg"
     }
