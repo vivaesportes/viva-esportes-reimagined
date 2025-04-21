@@ -1,3 +1,4 @@
+
 import Layout from "@/components/ui/layout/Layout";
 import Hero from "@/components/home/Hero";
 import Sobre from "@/components/home/Sobre";
@@ -11,14 +12,16 @@ import Contato from "@/components/home/Contato";
 const Index = () => {
   return (
     <Layout>
-      <Hero />
-      <Sobre />
-      <Modalidades />
-      <Locais />
-      <Galeria />
-      <Depoimentos />
-      <Eventos />
-      <Contato />
+      <div className="flex flex-col w-full">
+        <Hero />
+        <Sobre />
+        <Modalidades />
+        <Locais />
+        <Galeria />
+        <Depoimentos />
+        <Eventos />
+        <Contato />
+      </div>
     </Layout>
   );
 };

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import GalleryItem from "./galeria/GalleryItem";
 
 const Galeria = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -80,25 +81,7 @@ const Galeria = () => {
         {/* Desktop Gallery */}
         <div className="hidden md:grid grid-cols-3 gap-5">
           {galeria.map((item, index) => (
-            <motion.div 
-              key={item.id}
-              className="relative overflow-hidden rounded-lg shadow-lg group cursor-pointer aspect-square"
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              whileHover={{ scale: 1.03 }}
-            >
-              <img 
-                src={item.image} 
-                alt={item.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
-                <h3 className="text-xl font-bold text-white">{item.title}</h3>
-                <p className="text-white/80">{item.description}</p>
-              </div>
-            </motion.div>
+            <GalleryItem key={item.id} item={item} index={index} />
           ))}
         </div>
 
