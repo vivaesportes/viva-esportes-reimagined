@@ -57,6 +57,7 @@ const App = () => {
               <Route path="/contato" element={<Index />} />
               
               <Route path="/login" element={<Login />} />
+              
               <Route 
                 path="/painel" 
                 element={
