@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -19,6 +18,18 @@ const Galeria = () => {
       title: "Apresentação de Ballet",
       description: "Apresentação de fim de ano da turma de ballet",
       image: "/placeholder.svg",
+      galeriaPascoa: [
+        { image: "/lovable-uploads/50ad7bf0-c84e-444a-8a4d-efcb64bf66d6.png", title: "Ballet - Páscoa 1" },
+        { image: "/lovable-uploads/b7132928-b31e-4446-8d23-385531a9b33c.png", title: "Ballet - Páscoa 2" },
+        { image: "/lovable-uploads/87cdf775-5343-457d-b3e6-a8cd95a42e55.png", title: "Ballet - Páscoa 3" },
+        { image: "/lovable-uploads/87cdf775-5343-457d-b3e6-a8cd95a42e55.png", title: "Ballet - Páscoa 3 (Duplicada)" },
+        { image: "/lovable-uploads/818070da-6f25-4f03-b519-0ff410320bd4.png", title: "Ballet - Páscoa 4" },
+        { image: "/lovable-uploads/fed7f2f1-63af-42e8-8976-5b1bcd806145.png", title: "Ballet - Páscoa 5" },
+        { image: "/lovable-uploads/0b26c003-9201-4df3-b528-59f65f7d7fae.png", title: "Ballet - Páscoa 6" },
+        { image: "/lovable-uploads/ffb3742a-fc34-45d9-acf0-118f5b5978ae.png", title: "Ballet - Páscoa 7" },
+        { image: "/lovable-uploads/1c5d584f-e0c3-4ae4-bc82-bbe05df90267.png", title: "Ballet - Páscoa 8" },
+        { image: "/lovable-uploads/9fbda02a-0a4a-46f9-9026-9ba7d96a8fbe.png", title: "Ballet - Páscoa 9" },
+      ],
     },
     {
       id: 3,
@@ -80,9 +91,23 @@ const Galeria = () => {
 
         {/* Desktop Gallery */}
         <div className="hidden md:grid grid-cols-3 gap-5">
-          {galeria.map((item, index) => (
-            <GalleryItem key={item.id} item={item} index={index} />
-          ))}
+          {galeria.map((item, index) => {
+            if (item.id === 2 && item.galeriaPascoa) {
+              return (
+                <div key={item.id} className="flex flex-col gap-4">
+                  <GalleryItem item={item} index={index} />
+                  <div className="grid grid-cols-2 gap-2">
+                    {item.galeriaPascoa.map((sub, i) => (
+                      <div key={i} className="rounded overflow-hidden shadow">
+                        <img src={sub.image} alt={sub.title} className="w-full h-32 object-cover" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            }
+            return <GalleryItem key={item.id} item={item} index={index} />;
+          })}
         </div>
 
         {/* Mobile Carousel */}

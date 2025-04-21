@@ -1,140 +1,71 @@
 
-import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import Logo from "@/components/ui/Logo";
+import Logo from "../Logo";
 
+// Ajuste para obter a rota atual e destacar itens do menu conforme necessário
 const Navbar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 20) {
-        setScrolled(true);
-      } else {
-        setScrolled(false);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // Add exact path matching to make sure we can identify active links properly
-  const navLinks = [
-    { title: "Início", path: "/" },
-    { title: "Modalidades", path: "/modalidades" },
-    { title: "Locais", path: "/locais" },
-    { title: "Galeria", path: "/galeria" },
-    { title: "Eventos", path: "/eventos" },
-    { title: "Contato", path: "/contato" },
-  ];
-
-  // Update WhatsApp number for Matricule-se button with international format
-  const whatsappNumber = "5531992901175";
-  const whatsappMessage = "Olá! Gostaria de saber mais sobre matrículas na Viva Esportes.";
-  const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(whatsappMessage)}`;
-
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white shadow-md py-2"
-          : "bg-transparent py-4"
-      }`}
-    >
-      <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center space-x-2">
-          <Logo size={48} className="min-w-[40px] max-w-[52px] h-auto" />
-          <span className="text-2xl font-bold flex items-end gap-1 select-none">
-            <span className="text-viva-blue">Viva</span>
-            <span className="text-viva-red">Esportes</span>
-          </span>
+    <nav className="bg-white fixed w-full top-0 left-0 z-50 shadow">
+      <div className="container mx-auto flex justify-between items-center py-3 px-4">
+        <Link to="/" className="flex items-center gap-2">
+          <Logo className="h-8 w-8" />
+          <span className="font-bold text-viva-darkBlue">Viva Esportes</span>
         </Link>
-
-        {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
-          {navLinks.map((link, index) => (
+        <ul className="flex gap-6 items-center">
+          <li>
             <Link
-              key={index}
-              to={link.path}
-              className={`font-medium transition-colors ${
-                location.pathname === link.path 
-                  ? "text-viva-blue font-semibold" 
-                  : "text-viva-darkGray hover:text-viva-blue"
+              to="/modalidades"
+              className={`hover:text-viva-blue transition-colors ${
+                location.pathname === "/modalidades" ? "text-viva-blue font-bold" : ""
               }`}
-              onClick={() => console.log(`Navigating to: ${link.path}`)}
             >
-              {link.title}
+              Nossas Modalidades
             </Link>
-          ))}
-          <Button
-            asChild
-            className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full"
-          >
-            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              Matricule-se
-            </a>
-          </Button>
-        </div>
-
-        {/* Mobile Navigation Toggle */}
-        <div className="md:hidden">
-          <button
-            onClick={() => setIsOpen(!isOpen)}
-            className="text-viva-darkGray p-2"
-          >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          className="md:hidden bg-white absolute top-full left-0 w-full shadow-md py-4"
-        >
-          <div className="container mx-auto px-4 flex flex-col space-y-4">
-            {navLinks.map((link, index) => (
-              <Link
-                key={index}
-                to={link.path}
-                className={`font-medium py-2 transition-colors ${
-                  location.pathname === link.path 
-                    ? "text-viva-blue font-semibold" 
-                    : "text-viva-darkGray hover:text-viva-blue"
-                }`}
-                onClick={() => {
-                  console.log(`Mobile navigating to: ${link.path}`);
-                  setIsOpen(false);
-                }}
-              >
-                {link.title}
-              </Link>
-            ))}
-            <Button
-              asChild
-              className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full w-full"
+          </li>
+          <li>
+            <Link
+              to="/locais"
+              className={`hover:text-viva-blue transition-colors ${
+                location.pathname === "/locais" ? "text-viva-blue font-bold" : ""
+              }`}
             >
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setIsOpen(false)}
-              >
-                Matricule-se
-              </a>
-            </Button>
-          </div>
-        </motion.div>
-      )}
+              Nossos Locais
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/galeria"
+              className={`hover:text-viva-blue transition-colors ${
+                location.pathname === "/galeria" ? "text-viva-blue font-bold" : ""
+              }`}
+            >
+              Nossa Galeria
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/eventos"
+              className={`hover:text-viva-blue transition-colors ${
+                location.pathname === "/eventos" ? "text-viva-blue font-bold" : ""
+              }`}
+            >
+              Eventos
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/contato"
+              className={`bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-2 px-4 rounded-full transition-colors ${
+                location.pathname === "/contato" ? "ring-2 ring-viva-red" : ""
+              }`}
+            >
+              Fale Conosco
+            </Link>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 };
