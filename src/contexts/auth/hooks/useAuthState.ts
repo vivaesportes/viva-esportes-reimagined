@@ -21,7 +21,24 @@ export const useAuthState = () => {
         setLoading(true);
         setAuthError(null);
         
-        // First set up the auth state listener
+        // Primeiro configure o listener de eventos de autenticação
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
+          console.log('🔄 Evento de auth:', event, 'na URL:', window.location.href);
+          
+          if (isMounted) {
+            setSession(currentSession);
+            setUser(currentSession?.user || null);
+            
+            if (event === 'SIGNED_OUT') {
+              console.log("🚪 Usuário fez logout");
+              setProfile(null);
+              setLoading(false);
+              setAuthError(null);
+            }
+          }
+        });
+        
+        // Depois verifique a sessão atual
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         console.log("🔑 Sessão inicial:", initialSession);
         
@@ -31,6 +48,10 @@ export const useAuthState = () => {
           setAuthInitialized(true);
           setLoading(false);
         }
+        
+        return () => {
+          subscription.unsubscribe();
+        };
       } catch (error: any) {
         console.error('❌ Erro ao carregar sessão inicial:', error);
         if (isMounted) {
@@ -43,25 +64,8 @@ export const useAuthState = () => {
 
     initializeAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
-      console.log('🔄 Evento de auth:', event);
-      
-      if (isMounted) {
-        setSession(currentSession);
-        setUser(currentSession?.user || null);
-        
-        if (event === 'SIGNED_OUT') {
-          console.log("🚪 Usuário fez logout");
-          setProfile(null);
-          setLoading(false);
-          setAuthError(null);
-        }
-      }
-    });
-
     return () => {
       isMounted = false;
-      subscription.unsubscribe();
     };
   }, []);
 

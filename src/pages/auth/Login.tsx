@@ -11,6 +11,7 @@ import Layout from "@/components/ui/layout/Layout";
 import Logo from "@/components/ui/Logo";
 import { Loader2, Mail, Eye, EyeOff, Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 const Login = () => {
   const { signIn, isAuthenticated, isAdmin, profile } = useAuth();
@@ -32,8 +33,22 @@ const Login = () => {
       isAuthenticated, 
       isAdmin, 
       profileRole: profile?.role,
-      from
+      from,
+      currentURL: window.location.href
     });
+    
+    // Verificar sessão atual manualmente
+    const checkCurrentSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      console.log("Sessão atual:", data.session);
+      
+      if (data.session) {
+        // Já existe uma sessão, mas o estado React pode não refletir isso
+        console.log("Sessão existente detectada, atualizando estado...");
+      }
+    };
+    
+    checkCurrentSession();
     
     // Redirecionar se já estiver autenticado
     if (isAuthenticated) {
