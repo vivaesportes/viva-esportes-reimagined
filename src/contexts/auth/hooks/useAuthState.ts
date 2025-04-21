@@ -21,7 +21,7 @@ export const useAuthState = () => {
         setLoading(true);
         setAuthError(null);
         
-        // Primeiro configure o listener de eventos de autenticação
+        // First set up the auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
           console.log('🔄 Evento de auth:', event, 'na URL:', window.location.href);
           
@@ -38,8 +38,11 @@ export const useAuthState = () => {
           }
         });
         
-        // Depois verifique a sessão atual
-        const { data: { session: initialSession } } = await supabase.auth.getSession();
+        // Then check for the current session
+        const { data: { session: initialSession }, error } = await supabase.auth.getSession();
+        
+        if (error) throw error;
+        
         console.log("🔑 Sessão inicial:", initialSession);
         
         if (isMounted) {

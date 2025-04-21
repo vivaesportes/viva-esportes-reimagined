@@ -23,4 +23,6 @@ export interface AuthContextType {
   authError: string | null;
   retryProfileFetch: () => Promise<UserProfile>;
   resetAuthState: () => void;
+  databaseCheck?: string | null;
+  checkingDatabase?: boolean;
 }
