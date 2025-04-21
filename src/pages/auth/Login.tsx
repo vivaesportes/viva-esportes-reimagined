@@ -64,6 +64,7 @@ const Login = () => {
         });
       } else {
         console.log("Login bem-sucedido");
+        // O redirecionamento será feito pelo useEffect quando isAuthenticated for atualizado
       }
     } catch (error: any) {
       console.error("Erro inesperado:", error);

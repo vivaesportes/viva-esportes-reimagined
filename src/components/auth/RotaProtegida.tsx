@@ -15,6 +15,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   const { isAuthenticated, loading, profile, isAdmin } = useAuth();
   const location = useLocation();
 
+  // Logs detalhados para debug
   console.log("RotaProtegida - Caminho atual:", location.pathname);
   console.log("RotaProtegida - Perfil do usuário:", profile);
   console.log("RotaProtegida - É admin?", isAdmin, "Role do perfil:", profile?.role);
@@ -80,17 +81,29 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Rota que requer permissão de administrador
-  if (nivelRequerido === 'admin' && !isAdmin) {
-    console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
-    console.error("Redirecionando para o painel do professor");
-    return <Navigate to="/painel" replace />;
+  // Verificação específica para rotas de administrador
+  if (nivelRequerido === 'admin') {
+    console.log("Rota requer nível admin, verificando permissões...");
+    
+    if (!isAdmin) {
+      console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
+      console.error("Redirecionando para o painel do professor");
+      return <Navigate to="/painel" replace />;
+    }
+    
+    console.log("Usuário é admin, permitindo acesso à rota protegida");
   }
 
-  // Se a rota é /admin mas o usuário não é admin, redireciona para o painel de professor
-  if (location.pathname === "/admin" && !isAdmin) {
-    console.error("Tentativa de acesso ao painel admin por usuário não-admin");
-    return <Navigate to="/painel" replace />;
+  // Verificação específica para rota /admin
+  if (location.pathname === "/admin") {
+    console.log("Tentativa de acesso ao caminho /admin");
+    
+    if (!isAdmin) {
+      console.error("Tentativa de acesso ao painel admin por usuário não-admin");
+      return <Navigate to="/painel" replace />;
+    }
+    
+    console.log("Usuário é admin, permitindo acesso ao painel admin");
   }
 
   return <>{children}</>;

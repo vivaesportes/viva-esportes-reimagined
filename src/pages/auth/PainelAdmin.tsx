@@ -4,7 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 import PainelLayout from '@/components/auth/PainelLayout';
-import { Users, UserPlus, Settings } from 'lucide-react';
+import { Users, UserPlus, Settings, ShieldCheck } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -68,7 +68,10 @@ const PainelAdmin = () => {
   return (
     <PainelLayout>
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">Painel de Administração</h1>
+        <h1 className="text-2xl font-bold mb-2 flex items-center">
+          <ShieldCheck className="mr-2 h-6 w-6 text-purple-600" />
+          Painel de Administração
+        </h1>
         <p className="text-gray-500">Gerencie usuários e configurações do sistema</p>
       </div>
 
