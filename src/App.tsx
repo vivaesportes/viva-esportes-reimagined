@@ -13,6 +13,7 @@ import PainelProfessor from "./pages/auth/PainelProfessor";
 import PainelAdmin from "./pages/auth/PainelAdmin";
 import RotaProtegida from "./components/auth/RotaProtegida";
 import { AuthProvider } from "./contexts/AuthContext";
+import { isSupabaseConfigured } from "./lib/supabase";
 
 const queryClient = new QueryClient();
 
@@ -28,55 +29,62 @@ const ScrollToTop = () => {
   return null;
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <ScrollToTop />
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/modalidades" element={<Index />} />
-            <Route path="/locais" element={<Index />} />
-            <Route path="/galeria" element={<Index />} />
-            
-            {/* Template route for all gallery detail pages */}
-            <Route path="/galeria/ballet-pascoa" element={<GaleriaBalletPascoa />} />
-            {/* Additional gallery detail pages will follow the same pattern:
-                <Route path="/galeria/nome-da-galeria" element={<GaleriaNomeDaGaleria />} /> 
-            */}
-            
-            <Route path="/eventos" element={<Index />} />
-            <Route path="/contato" element={<Index />} />
-            
-            {/* Rotas de autenticação */}
-            <Route path="/login" element={<Login />} />
-            <Route 
-              path="/painel" 
-              element={
-                <RotaProtegida>
-                  <PainelProfessor />
-                </RotaProtegida>
-              } 
-            />
-            <Route 
-              path="/admin" 
-              element={
-                <RotaProtegida nivelRequerido="admin">
-                  <PainelAdmin />
-                </RotaProtegida>
-              } 
-            />
-            
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Verifica se o Supabase está configurado e exibe um aviso no console se não estiver
+  if (!isSupabaseConfigured()) {
+    console.warn('⚠️ As variáveis de ambiente do Supabase não estão configuradas. O sistema de autenticação não funcionará corretamente.');
+  }
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <ScrollToTop />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/modalidades" element={<Index />} />
+              <Route path="/locais" element={<Index />} />
+              <Route path="/galeria" element={<Index />} />
+              
+              {/* Template route for all gallery detail pages */}
+              <Route path="/galeria/ballet-pascoa" element={<GaleriaBalletPascoa />} />
+              {/* Additional gallery detail pages will follow the same pattern:
+                  <Route path="/galeria/nome-da-galeria" element={<GaleriaNomeDaGaleria />} /> 
+              */}
+              
+              <Route path="/eventos" element={<Index />} />
+              <Route path="/contato" element={<Index />} />
+              
+              {/* Rotas de autenticação */}
+              <Route path="/login" element={<Login />} />
+              <Route 
+                path="/painel" 
+                element={
+                  <RotaProtegida>
+                    <PainelProfessor />
+                  </RotaProtegida>
+                } 
+              />
+              <Route 
+                path="/admin" 
+                element={
+                  <RotaProtegida nivelRequerido="admin">
+                    <PainelAdmin />
+                  </RotaProtegida>
+                } 
+              />
+              
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

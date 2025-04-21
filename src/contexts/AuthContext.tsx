@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 import { Session, User } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
 
@@ -45,6 +45,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Verifica se o Supabase está configurado
+    if (!isSupabaseConfigured()) {
+      console.error('Configuração do Supabase incompleta. Verifique as variáveis de ambiente.');
+      setLoading(false);
+      return;
+    }
+
     // Obter a sessão inicial
     const getInitialSession = async () => {
       try {
