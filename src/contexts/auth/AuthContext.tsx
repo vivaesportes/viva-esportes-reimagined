@@ -17,6 +17,7 @@ const AuthContext = createContext<AuthContextType>({
   signOut: async () => {},
   isAuthenticated: false,
   isAdmin: false,
+  authError: null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -26,7 +27,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
-  const { profile, setProfile, fetchProfile } = useProfile();
+  const [authError, setAuthError] = useState<string | null>(null);
+  const { profile, setProfile, fetchProfile, profileError } = useProfile();
   const { signIn, signOut } = useAuthActions();
 
   useEffect(() => {
@@ -36,34 +38,48 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
 
+    let isMounted = true;
+    
     const getInitialSession = async () => {
       try {
         console.log("🔍 Buscando sessão inicial...");
         setLoading(true);
+        setAuthError(null);
         
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         console.log("🔑 Sessão inicial:", initialSession);
         
-        setSession(initialSession);
-        setUser(initialSession?.user || null);
-        
-        if (initialSession?.user) {
-          console.log("👤 Usuário encontrado na sessão:", initialSession.user.id);
-          // Adicionando um pequeno atraso para evitar condições de corrida
-          setTimeout(async () => {
-            await fetchProfile(initialSession.user.id);
+        if (isMounted) {
+          setSession(initialSession);
+          setUser(initialSession?.user || null);
+          
+          if (initialSession?.user) {
+            console.log("👤 Usuário encontrado na sessão:", initialSession.user.id);
+            
+            try {
+              // Adicionando um pequeno atraso para evitar condições de corrida
+              await new Promise(resolve => setTimeout(resolve, 500));
+              await fetchProfile(initialSession.user.id);
+            } catch (error: any) {
+              console.error("❌ Erro ao buscar perfil na inicialização:", error.message);
+              setAuthError(`Erro ao buscar perfil: ${error.message}`);
+            } finally {
+              if (isMounted) setLoading(false);
+            }
+          } else {
+            console.log("🚫 Nenhum usuário encontrado na sessão");
             setLoading(false);
-          }, 500);
-        } else {
-          console.log("🚫 Nenhum usuário encontrado na sessão");
-          setLoading(false);
+          }
+          
+          setAuthInitialized(true);
         }
-        
-        setAuthInitialized(true);
-      } catch (error) {
+      } catch (error: any) {
         console.error('❌ Erro ao carregar sessão inicial:', error);
-        setLoading(false);
-        setAuthInitialized(true);
+        if (isMounted) {
+          setLoading(false);
+          setAuthInitialized(true);
+          setAuthError(`Erro ao carregar sessão: ${error.message}`);
+        }
         toast({
           title: "Erro ao carregar sessão",
           description: "Não foi possível recuperar sua sessão. Por favor, faça login novamente.",
@@ -76,29 +92,46 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
       console.log('🔄 Evento de auth:', event);
-      setSession(currentSession);
-      setUser(currentSession?.user || null);
       
-      if (event === 'SIGNED_IN' && currentSession?.user) {
-        console.log("🔓 Usuário fez login:", currentSession.user.id);
-        setLoading(true);
+      if (isMounted) {
+        setSession(currentSession);
+        setUser(currentSession?.user || null);
         
-        // Adicionando um pequeno atraso para evitar condições de corrida
-        setTimeout(async () => {
-          await fetchProfile(currentSession.user.id);
+        if (event === 'SIGNED_IN' && currentSession?.user) {
+          console.log("🔓 Usuário fez login:", currentSession.user.id);
+          setLoading(true);
+          
+          try {
+            // Adicionando um pequeno atraso para evitar condições de corrida
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await fetchProfile(currentSession.user.id);
+          } catch (error: any) {
+            console.error("❌ Erro ao buscar perfil após login:", error.message);
+            setAuthError(`Erro ao buscar perfil: ${error.message}`);
+          } finally {
+            if (isMounted) setLoading(false);
+          }
+        } else if (event === 'SIGNED_OUT') {
+          console.log("🚪 Usuário fez logout");
+          setProfile(null);
           setLoading(false);
-        }, 500);
-      } else if (event === 'SIGNED_OUT') {
-        console.log("🚪 Usuário fez logout");
-        setProfile(null);
-        setLoading(false);
+          setAuthError(null);
+        }
       }
     });
 
     return () => {
+      isMounted = false;
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
+
+  useEffect(() => {
+    // Se houver erro no perfil, armazena-o como erro de autenticação
+    if (profileError) {
+      setAuthError(profileError);
+    }
+  }, [profileError]);
 
   const isAdmin = profile?.role === 'admin';
   
@@ -107,7 +140,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     profileId: profile?.id,
     profileRole: profile?.role,
     calculatedIsAdmin: isAdmin,
-    authenticated: !!user
+    authenticated: !!user,
+    error: authError
   });
 
   const value = {
@@ -119,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signOut,
     isAuthenticated: !!user,
     isAdmin,
+    authError,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

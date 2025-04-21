@@ -20,4 +20,5 @@ export interface AuthContextType {
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  authError: string | null;
 }

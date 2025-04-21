@@ -2,10 +2,11 @@
 import { useAuth } from "@/contexts/auth/AuthContext";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/auth/types";
-import { Loader2, AlertTriangle } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface RotaProtegidaProps {
   children: React.ReactNode;
@@ -13,7 +14,7 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, authError } = useAuth();
   const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
 
@@ -24,7 +25,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     if (loading) {
       timeoutId = setTimeout(() => {
         setLoadingTimeout(true);
-      }, 8000); // 8 segundos
+      }, 5000); // 5 segundos
     }
     
     return () => {
@@ -38,6 +39,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   console.log("RotaProtegida - É admin?", isAdmin, "Role do perfil:", profile?.role);
   console.log("RotaProtegida - Nível requerido:", nivelRequerido);
   console.log("RotaProtegida - Loading:", loading, "Loading timeout:", loadingTimeout);
+  console.log("RotaProtegida - Erro de autenticação:", authError);
 
   // Verifica se o Supabase está configurado
   const supabaseConfigured = isSupabaseConfigured();
@@ -87,33 +89,66 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-viva-blue mb-4" />
-        <span className="text-lg">Carregando...</span>
+        <Loader2 className="h-10 w-10 animate-spin text-viva-blue mb-6" />
+        <span className="text-xl font-medium mb-4">Carregando...</span>
         
-        {loadingTimeout && (
-          <div className="mt-8 max-w-md text-center p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <AlertTriangle className="h-6 w-6 text-amber-500 mx-auto mb-2" />
-            <p className="text-amber-700 mb-2">Está demorando mais do que o esperado.</p>
-            <p className="text-sm text-gray-600 mb-4">
+        {loadingTimeout && !authError && (
+          <div className="mt-6 max-w-md text-center p-6 bg-amber-50 border border-amber-200 rounded-lg">
+            <AlertTriangle className="h-8 w-8 text-amber-500 mx-auto mb-4" />
+            <p className="text-amber-700 text-lg font-medium mb-3">Está demorando mais do que o esperado</p>
+            <p className="text-gray-600 mb-6">
               Isso pode acontecer se você está fazendo login pela primeira vez ou se houver problemas com a conexão.
             </p>
-            <div className="flex justify-center gap-2">
+            <div className="flex justify-center gap-4">
               <Button 
                 variant="outline" 
-                size="sm"
+                size="lg"
+                className="gap-2 items-center inline-flex"
                 onClick={() => window.location.reload()}
               >
+                <RefreshCw className="h-4 w-4" />
                 Tentar novamente
               </Button>
               <Button 
                 variant="destructive" 
-                size="sm"
+                size="lg"
                 onClick={() => window.location.href = '/login'}
               >
                 Voltar para o login
               </Button>
             </div>
           </div>
+        )}
+        
+        {authError && (
+          <Alert variant="destructive" className="mt-6 max-w-md">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Erro ao carregar perfil</AlertTitle>
+            <AlertDescription>
+              Ocorreu um erro ao buscar seu perfil. Tente novamente mais tarde.
+              <div className="mt-2 pt-2 border-t border-red-200">
+                <code className="text-xs opacity-70">{authError}</code>
+              </div>
+              <div className="mt-4 flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-1"
+                  onClick={() => window.location.reload()}
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Tentar novamente
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  size="sm"
+                  onClick={() => window.location.href = '/login'}
+                >
+                  Voltar para o login
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
         )}
       </div>
     );
