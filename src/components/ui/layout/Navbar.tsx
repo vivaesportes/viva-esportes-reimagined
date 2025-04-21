@@ -32,6 +32,10 @@ const Navbar = () => {
     { title: "Contato", path: "/contato" },
   ];
 
+  // WhatsApp link for Matricule-se button
+  const whatsappNumber = "31992901175";
+  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+
   return (
     <nav
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
@@ -60,8 +64,13 @@ const Navbar = () => {
               {link.title}
             </Link>
           ))}
-          <Button className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full">
-            Matricule-se
+          <Button
+            asChild
+            className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full"
+          >
+            <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+              Matricule-se
+            </a>
           </Button>
         </div>
 
@@ -95,8 +104,18 @@ const Navbar = () => {
                 {link.title}
               </Link>
             ))}
-            <Button className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full w-full">
-              Matricule-se
+            <Button
+              asChild
+              className="bg-viva-red hover:bg-viva-darkRed text-white rounded-full w-full"
+            >
+              <a
+                href={whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsOpen(false)}
+              >
+                Matricule-se
+              </a>
             </Button>
           </div>
         </motion.div>
@@ -106,3 +125,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
