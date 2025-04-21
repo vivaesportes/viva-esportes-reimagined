@@ -12,7 +12,7 @@ import Login from "./pages/auth/Login";
 import PainelProfessor from "./pages/auth/PainelProfessor";
 import PainelAdmin from "./pages/auth/PainelAdmin";
 import RotaProtegida from "./components/auth/RotaProtegida";
-import { AuthProvider } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/auth/AuthContext";
 import PrimeiroAcesso from "./pages/auth/PrimeiroAcesso";
 
 const queryClient = new QueryClient();
