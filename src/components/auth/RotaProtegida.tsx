@@ -1,12 +1,14 @@
 
 import { useAuth } from "@/contexts/auth/AuthContext";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { UserRole } from "@/contexts/auth/types";
-import { Loader2, AlertTriangle, RefreshCw } from "lucide-react";
+import { Loader2, AlertTriangle, RefreshCw, LogOut } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/lib/supabase";
 
 interface RotaProtegidaProps {
   children: React.ReactNode;
@@ -14,26 +16,37 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch, resetAuthState } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch, resetAuthState, user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [longLoadingTimeout, setLongLoadingTimeout] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [resetAttempted, setResetAttempted] = useState(false);
+  const [databaseCheck, setDatabaseCheck] = useState<string | null>(null);
+  const [checkingDatabase, setCheckingDatabase] = useState(false);
 
   // Timeout para mostrar mensagem de erro se o carregamento demorar muito
   useEffect(() => {
     let timeoutId: NodeJS.Timeout;
+    let longTimeoutId: NodeJS.Timeout;
     
     if (loading) {
       timeoutId = setTimeout(() => {
         setLoadingTimeout(true);
-      }, 5000); // 5 segundos
+      }, 3000); // 3 segundos
+      
+      longTimeoutId = setTimeout(() => {
+        setLongLoadingTimeout(true);
+      }, 10000); // 10 segundos
     } else {
       setLoadingTimeout(false);
+      setLongLoadingTimeout(false);
     }
     
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
+      if (longTimeoutId) clearTimeout(longTimeoutId);
     };
   }, [loading]);
 
@@ -60,8 +73,47 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     setResetAttempted(true);
   };
 
-  const handleLogout = () => {
-    window.location.href = '/login';
+  const handleForceLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Logout forçado",
+        description: "Você foi desconectado. Por favor, faça login novamente.",
+      });
+      navigate('/login');
+    } catch (error) {
+      console.error("Erro ao forçar logout:", error);
+      // Redirecionar mesmo se houver erro
+      navigate('/login');
+    }
+  };
+
+  const checkProfileInDatabase = async () => {
+    if (!user?.id) {
+      setDatabaseCheck("Nenhum usuário autenticado para verificar");
+      return;
+    }
+    
+    setCheckingDatabase(true);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      if (error) {
+        setDatabaseCheck(`Erro ao verificar perfil: ${error.message}`);
+      } else if (!data) {
+        setDatabaseCheck("Perfil não encontrado no banco de dados");
+      } else {
+        setDatabaseCheck(`Perfil encontrado: ${JSON.stringify(data)}`);
+      }
+    } catch (error: any) {
+      setDatabaseCheck(`Erro na verificação: ${error.message}`);
+    } finally {
+      setCheckingDatabase(false);
+    }
   };
 
   // Verifica se o Supabase está configurado
@@ -97,7 +149,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
             </ol>
             <div className="flex justify-center pt-2">
               <Button 
-                onClick={() => window.location.href = '/'}
+                onClick={() => navigate('/')}
                 className="bg-red-600 hover:bg-red-700"
               >
                 Voltar para a Página Inicial
@@ -146,11 +198,49 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
               <Button 
                 variant="destructive" 
                 size="lg"
-                onClick={handleLogout}
+                onClick={handleForceLogout}
               >
+                <LogOut className="h-4 w-4 mr-2" />
                 Voltar para o login
               </Button>
             </div>
+            
+            {longLoadingTimeout && (
+              <div className="mt-8 border-t border-amber-200 pt-6">
+                <h3 className="font-medium text-amber-800 mb-4">Diagnóstico Avançado</h3>
+                
+                <div className="flex justify-center mb-4">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={checkProfileInDatabase}
+                    disabled={checkingDatabase}
+                    className="text-amber-700 border-amber-300"
+                  >
+                    {checkingDatabase ? (
+                      <>
+                        <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                        Verificando banco de dados...
+                      </>
+                    ) : (
+                      'Verificar perfil no banco de dados'
+                    )}
+                  </Button>
+                </div>
+                
+                {databaseCheck && (
+                  <div className="bg-white p-3 rounded border border-amber-200 text-sm font-mono text-amber-800 max-h-32 overflow-y-auto">
+                    {databaseCheck}
+                  </div>
+                )}
+                
+                <div className="mt-4 text-sm text-amber-700">
+                  <p>Usuário atual: {user?.id || 'Nenhum'}</p>
+                  <p>Email: {user?.email || 'Indisponível'}</p>
+                  <p className="mt-2">Se o problema persistir, tente limpar o cache do navegador ou usar uma janela anônima.</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
         
@@ -187,7 +277,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
                 <Button 
                   variant="destructive" 
                   size="sm"
-                  onClick={handleLogout}
+                  onClick={handleForceLogout}
                 >
                   Voltar para o login
                 </Button>

@@ -40,7 +40,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   } = useProfile();
   const { signIn, signOut } = useAuthActions();
 
-  // Função para tentar buscar o perfil novamente
+  // Função para tentar buscar o perfil novamente com melhor tratamento de erro
   const retryProfileFetch = useCallback(async () => {
     if (!user) {
       toast({
@@ -56,8 +56,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     console.log("🔄 Tentando carregar perfil novamente para o usuário:", user.id);
     
     try {
+      // Forçar recarregamento da sessão primeiro
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw sessionError;
+      }
+      
+      if (!sessionData.session) {
+        throw new Error("Sessão inválida. Faça login novamente.");
+      }
+      
+      // Tentar buscar o perfil
       await fetchProfile(user.id);
       setLoading(false);
+      
+      toast({
+        title: "Perfil carregado",
+        description: "Seu perfil foi carregado com sucesso.",
+      });
     } catch (error: any) {
       console.error("❌ Erro ao recarregar perfil:", error.message);
       setAuthError(`Erro ao recarregar perfil: ${error.message}`);
@@ -70,13 +87,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user, fetchProfile]);
 
-  const resetAuthState = useCallback(() => {
-    setSession(null);
-    setUser(null);
-    clearProfile();
-    setAuthError(null);
-    setLoading(false);
-    console.log("🔄 Estado de autenticação resetado");
+  // Função melhorada para resetar o estado de autenticação
+  const resetAuthState = useCallback(async () => {
+    console.log("🔄 Iniciando reset completo do estado de autenticação");
+    
+    try {
+      // Limpar estados locais primeiro
+      setSession(null);
+      setUser(null);
+      clearProfile();
+      setAuthError(null);
+      setLoading(false);
+      setAuthInitialized(false);
+      
+      // Forçar logout no Supabase (sem falhar se já estiver deslogado)
+      try {
+        await supabase.auth.signOut();
+        console.log("✅ Logout do Supabase realizado");
+      } catch (e) {
+        console.warn("⚠️ Erro ao fazer logout do Supabase:", e);
+        // Continuamos mesmo se houver erro no logout
+      }
+      
+      // Reforçar limpeza do storage local
+      try {
+        localStorage.removeItem('supabase.auth.token');
+        console.log("✅ Token local removido");
+      } catch (e) {
+        console.warn("⚠️ Erro ao limpar token local:", e);
+      }
+      
+      // Reiniciar o processo de autenticação
+      setTimeout(() => {
+        setAuthInitialized(true);
+        console.log("✅ Estado de autenticação resetado");
+        
+        toast({
+          title: "Estado resetado",
+          description: "O estado de autenticação foi resetado. Tente fazer login novamente.",
+        });
+      }, 500);
+    } catch (error) {
+      console.error("❌ Erro ao resetar estado:", error);
+      toast({
+        title: "Erro ao resetar estado",
+        description: "Não foi possível resetar o estado de autenticação.",
+        variant: "destructive",
+      });
+    }
   }, [clearProfile]);
 
   useEffect(() => {
