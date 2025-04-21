@@ -6,12 +6,10 @@ import NavbarItems from "./NavbarItems";
 import NavbarAuthButton from "./NavbarAuthButton";
 
 interface NavbarMobileMenuProps {
-  isAuthenticated: boolean;
-  profileName?: string;
   onClose: () => void;
 }
 
-const NavbarMobileMenu = ({ isAuthenticated, profileName, onClose }: NavbarMobileMenuProps) => (
+const NavbarMobileMenu = ({ onClose }: NavbarMobileMenuProps) => (
   <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={onClose}>
     <div 
       className="absolute right-0 top-0 h-screen w-64 bg-white shadow-lg py-4 px-6 z-50"
@@ -40,8 +38,6 @@ const NavbarMobileMenu = ({ isAuthenticated, profileName, onClose }: NavbarMobil
         </li>
         <li className="mt-2">
           <NavbarAuthButton
-            isAuthenticated={isAuthenticated}
-            profileName={profileName}
             onClick={onClose}
             className="w-full justify-center"
           />
