@@ -102,7 +102,7 @@ const Contato = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg">Telefone</h4>
-                    <p className="text-gray-600">(11) 3456-7890</p>
+                    <p className="text-gray-600">(31) 99290-1175</p>
                   </div>
                 </div>
                 <div className="flex items-start">
@@ -111,7 +111,7 @@ const Contato = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg">WhatsApp</h4>
-                    <p className="text-gray-600">(11) 98765-4321</p>
+                    <p className="text-gray-600">(31) 99290-1175</p>
                     <a 
                       href="https://wa.me/5511987654321" 
                       target="_blank" 
@@ -128,7 +128,7 @@ const Contato = () => {
                   </div>
                   <div>
                     <h4 className="font-bold text-lg">E-mail</h4>
-                    <p className="text-gray-600">contato@vivaesportes.com.br</p>
+                    <p className="text-gray-600">esportesviva@gmail.com</p>
                   </div>
                 </div>
               </div>
@@ -139,11 +139,11 @@ const Contato = () => {
               <ul className="space-y-2">
                 <li className="flex justify-between">
                   <span className="text-gray-600">Segunda à Sexta:</span>
-                  <span className="font-medium">08:00 às 20:00</span>
+                  <span className="font-medium">16h às 20h</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-600">Sábado:</span>
-                  <span className="font-medium">08:00 às 14:00</span>
+                  <span className="font-medium">fechado</span>
                 </li>
                 <li className="flex justify-between">
                   <span className="text-gray-600">Domingo:</span>
