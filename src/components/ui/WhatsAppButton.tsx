@@ -3,13 +3,16 @@ import { motion } from "framer-motion";
 import { FaWhatsapp } from "react-icons/fa";
 
 type WhatsAppButtonProps = {
-  phoneNumber: string;
+  phoneNumber?: string; // Now optional, default to global number if not provided
   message?: string;
 };
 
-const WhatsAppButton = ({ 
-  phoneNumber, 
-  message = "Olá! Gostaria de saber mais sobre a Viva Esportes." 
+const DEFAULT_PHONE = "31992901175";
+const DEFAULT_MESSAGE = "Olá! Gostaria de saber mais sobre a Viva Esportes.";
+
+const WhatsAppButton = ({
+  phoneNumber = DEFAULT_PHONE,
+  message = DEFAULT_MESSAGE,
 }: WhatsAppButtonProps) => {
   const formattedPhone = phoneNumber.replace(/\D/g, "");
   const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodeURIComponent(message)}`;

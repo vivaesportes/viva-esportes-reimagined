@@ -7,6 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 const Contato = () => {
+  // All numbers and WhatsApp links use (31) 99290-1175
+  const whatsappNumber = "31992901175";
+  const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+
   return (
     <section className="py-20 bg-viva-gray">
       <div className="container mx-auto px-4">
@@ -113,7 +117,7 @@ const Contato = () => {
                     <h4 className="font-bold text-lg">WhatsApp</h4>
                     <p className="text-gray-600">(31) 99290-1175</p>
                     <a 
-                      href="https://wa.me/5511987654321" 
+                      href={whatsappUrl} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-green-600 hover:underline flex items-center mt-1"

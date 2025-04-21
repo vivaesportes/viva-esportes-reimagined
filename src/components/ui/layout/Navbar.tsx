@@ -32,7 +32,7 @@ const Navbar = () => {
     { title: "Contato", path: "/contato" },
   ];
 
-  // WhatsApp link for Matricule-se button
+  // Update WhatsApp number for Matricule-se button
   const whatsappNumber = "31992901175";
   const whatsappUrl = `https://wa.me/${whatsappNumber}`;
 
@@ -125,4 +125,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
