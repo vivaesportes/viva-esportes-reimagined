@@ -12,7 +12,8 @@ const supabaseOptions = {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true,
-    storage: localStorage
+    storageKey: 'viva_auth_token',
+    flowType: 'pkce',
   }
 };
 
@@ -32,8 +33,17 @@ export const getSiteUrl = () => {
   return isProd ? productionUrl : developmentUrl;
 };
 
-// Get login redirect URL - used for auth providers that require redirects
-export const getLoginRedirectUrl = () => {
+// Get login redirect options - used for auth providers that require redirects
+export const getLoginRedirectOptions = () => {
   const baseUrl = getSiteUrl();
-  return `${baseUrl}/login`;
+  return {
+    redirectTo: `${baseUrl}/login`,
+  };
 };
+
+// Check if Supabase is properly configured
+export function isSupabaseConfigured() {
+  return SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && 
+         SUPABASE_URL !== 'YOUR_SUPABASE_URL' && 
+         SUPABASE_PUBLISHABLE_KEY !== 'YOUR_SUPABASE_ANON_KEY';
+}
