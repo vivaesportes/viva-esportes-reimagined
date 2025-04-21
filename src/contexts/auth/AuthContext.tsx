@@ -6,6 +6,7 @@ import { isSupabaseConfigured } from '@/lib/supabase';
 import { AuthContextType } from './types';
 import { useProfile } from './useProfile';
 import { useAuthActions } from './useAuthActions';
+import { toast } from '@/hooks/use-toast';
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authInitialized, setAuthInitialized] = useState(false);
   const { profile, setProfile, fetchProfile } = useProfile();
   const { signIn, signOut } = useAuthActions();
 
@@ -37,6 +39,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const getInitialSession = async () => {
       try {
         console.log("🔍 Buscando sessão inicial...");
+        setLoading(true);
+        
         const { data: { session: initialSession } } = await supabase.auth.getSession();
         console.log("🔑 Sessão inicial:", initialSession);
         
@@ -45,14 +49,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         
         if (initialSession?.user) {
           console.log("👤 Usuário encontrado na sessão:", initialSession.user.id);
-          await fetchProfile(initialSession.user.id);
+          // Adicionando um pequeno atraso para evitar condições de corrida
+          setTimeout(async () => {
+            await fetchProfile(initialSession.user.id);
+            setLoading(false);
+          }, 500);
         } else {
           console.log("🚫 Nenhum usuário encontrado na sessão");
+          setLoading(false);
         }
+        
+        setAuthInitialized(true);
       } catch (error) {
         console.error('❌ Erro ao carregar sessão inicial:', error);
-      } finally {
         setLoading(false);
+        setAuthInitialized(true);
+        toast({
+          title: "Erro ao carregar sessão",
+          description: "Não foi possível recuperar sua sessão. Por favor, faça login novamente.",
+          variant: "destructive",
+        });
       }
     };
 
@@ -65,10 +81,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (event === 'SIGNED_IN' && currentSession?.user) {
         console.log("🔓 Usuário fez login:", currentSession.user.id);
-        await fetchProfile(currentSession.user.id);
+        setLoading(true);
+        
+        // Adicionando um pequeno atraso para evitar condições de corrida
+        setTimeout(async () => {
+          await fetchProfile(currentSession.user.id);
+          setLoading(false);
+        }, 500);
       } else if (event === 'SIGNED_OUT') {
         console.log("🚪 Usuário fez logout");
         setProfile(null);
+        setLoading(false);
       }
     });
 
@@ -91,7 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     session,
     user,
     profile,
-    loading,
+    loading: loading || !authInitialized,
     signIn,
     signOut,
     isAuthenticated: !!user,
