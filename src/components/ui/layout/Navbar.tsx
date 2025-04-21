@@ -38,7 +38,7 @@ const Navbar = () => {
             <Link
               to="/galeria"
               className={`hover:text-viva-blue transition-colors ${
-                location.pathname === "/galeria" ? "text-viva-blue font-bold" : ""
+                location.pathname.startsWith("/galeria") ? "text-viva-blue font-bold" : ""
               }`}
             >
               Nossa Galeria

@@ -2,9 +2,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import GalleryItem from "./galeria/GalleryItem";
+import { Link, useNavigate } from "react-router-dom";
 
 const Galeria = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const navigate = useNavigate();
 
   const galeria = [
     {
@@ -17,7 +19,7 @@ const Galeria = () => {
       id: 2,
       title: "Apresentação de Ballet",
       description: "Apresentação de fim de ano da turma de ballet",
-      image: "/placeholder.svg",
+      image: "/lovable-uploads/50ad7bf0-c84e-444a-8a4d-efcb64bf66d6.png",
       galeriaPascoa: [
         { image: "/lovable-uploads/50ad7bf0-c84e-444a-8a4d-efcb64bf66d6.png", title: "Ballet - Páscoa 1" },
         { image: "/lovable-uploads/b7132928-b31e-4446-8d23-385531a9b33c.png", title: "Ballet - Páscoa 2" },
@@ -30,6 +32,7 @@ const Galeria = () => {
         { image: "/lovable-uploads/1c5d584f-e0c3-4ae4-bc82-bbe05df90267.png", title: "Ballet - Páscoa 8" },
         { image: "/lovable-uploads/9fbda02a-0a4a-46f9-9026-9ba7d96a8fbe.png", title: "Ballet - Páscoa 9" },
       ],
+      link: "/galeria/ballet-pascoa"
     },
     {
       id: 3,
@@ -92,18 +95,11 @@ const Galeria = () => {
         {/* Desktop Gallery */}
         <div className="hidden md:grid grid-cols-3 gap-5">
           {galeria.map((item, index) => {
-            if (item.id === 2 && item.galeriaPascoa) {
+            if (item.id === 2 && item.galeriaPascoa && item.link) {
               return (
-                <div key={item.id} className="flex flex-col gap-4">
+                <Link to={item.link} key={item.id} className="hover-scale">
                   <GalleryItem item={item} index={index} />
-                  <div className="grid grid-cols-2 gap-2">
-                    {item.galeriaPascoa.map((sub, i) => (
-                      <div key={i} className="rounded overflow-hidden shadow">
-                        <img src={sub.image} alt={sub.title} className="w-full h-32 object-cover" />
-                      </div>
-                    ))}
-                  </div>
-                </div>
+                </Link>
               );
             }
             return <GalleryItem key={item.id} item={item} index={index} />;
@@ -114,15 +110,31 @@ const Galeria = () => {
         <div className="md:hidden relative">
           <div className="overflow-hidden rounded-lg shadow-lg">
             <div className="relative aspect-video">
-              <img 
-                src={galeria[currentIndex].image} 
-                alt={galeria[currentIndex].title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
-                <h3 className="text-xl font-bold text-white">{galeria[currentIndex].title}</h3>
-                <p className="text-white/80">{galeria[currentIndex].description}</p>
-              </div>
+              {galeria[currentIndex].id === 2 && galeria[currentIndex].link ? (
+                <Link to={galeria[currentIndex].link}>
+                  <img 
+                    src={galeria[currentIndex].image} 
+                    alt={galeria[currentIndex].title}
+                    className="w-full h-full object-cover cursor-pointer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
+                    <h3 className="text-xl font-bold text-white">{galeria[currentIndex].title}</h3>
+                    <p className="text-white/80">{galeria[currentIndex].description}</p>
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  <img 
+                    src={galeria[currentIndex].image} 
+                    alt={galeria[currentIndex].title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4">
+                    <h3 className="text-xl font-bold text-white">{galeria[currentIndex].title}</h3>
+                    <p className="text-white/80">{galeria[currentIndex].description}</p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           
@@ -160,12 +172,12 @@ const Galeria = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <a 
-            href="/galeria" 
+          <Link
+            to="/galeria"
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
           >
             Ver mais fotos
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

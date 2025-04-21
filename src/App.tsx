@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import GaleriaBalletPascoa from "./pages/GaleriaBalletPascoa";
 import { useEffect } from "react";
 
 const queryClient = new QueryClient();
@@ -34,6 +34,7 @@ const App = () => (
           <Route path="/modalidades" element={<Index />} />
           <Route path="/locais" element={<Index />} />
           <Route path="/galeria" element={<Index />} />
+          <Route path="/galeria/ballet-pascoa" element={<GaleriaBalletPascoa />} />
           <Route path="/eventos" element={<Index />} />
           <Route path="/contato" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
