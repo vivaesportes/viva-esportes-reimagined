@@ -47,7 +47,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     // Verifica se o Supabase está configurado
     if (!isSupabaseConfigured()) {
-      console.error('Configuração do Supabase incompleta. Verifique as variáveis de ambiente.');
+      console.warn('Supabase não está configurado com variáveis de ambiente válidas.');
       setLoading(false);
       return;
     }
@@ -111,6 +111,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signIn = async (email: string, password: string) => {
     try {
+      if (!isSupabaseConfigured()) {
+        toast({
+          title: "Erro ao fazer login",
+          description: "O Supabase não está configurado corretamente.",
+          variant: "destructive",
+        });
+        return { error: new Error("Supabase não configurado"), data: null };
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -147,6 +156,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const signOut = async () => {
     try {
+      if (!isSupabaseConfigured()) {
+        toast({
+          title: "Erro ao fazer logout",
+          description: "O Supabase não está configurado corretamente.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       await supabase.auth.signOut();
       toast({
         title: "Logout realizado com sucesso",

@@ -30,10 +30,14 @@ const ScrollToTop = () => {
 };
 
 const App = () => {
-  // Verifica se o Supabase está configurado e exibe um aviso no console se não estiver
-  if (!isSupabaseConfigured()) {
-    console.warn('⚠️ As variáveis de ambiente do Supabase não estão configuradas. O sistema de autenticação não funcionará corretamente.');
-  }
+  // Verifica se o Supabase está configurado e exibe um aviso no console
+  useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      console.warn('⚠️ As variáveis de ambiente do Supabase não estão configuradas. Para configurar corretamente acesse:');
+      console.warn('1. Projeto do Supabase > Settings > API');
+      console.warn('2. Configure as variáveis VITE_SUPABASE_URL e VITE_SUPABASE_ANON_KEY no seu projeto Lovable');
+    }
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
