@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -34,7 +35,13 @@ const App = () => (
           <Route path="/modalidades" element={<Index />} />
           <Route path="/locais" element={<Index />} />
           <Route path="/galeria" element={<Index />} />
+          
+          {/* Template route for all gallery detail pages */}
           <Route path="/galeria/ballet-pascoa" element={<GaleriaBalletPascoa />} />
+          {/* Additional gallery detail pages will follow the same pattern:
+              <Route path="/galeria/nome-da-galeria" element={<GaleriaNomeDaGaleria />} /> 
+          */}
+          
           <Route path="/eventos" element={<Index />} />
           <Route path="/contato" element={<Index />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
