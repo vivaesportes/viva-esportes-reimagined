@@ -1,15 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/auth/AuthContext';
-import { Card } from '@/components/ui/card';
 import { supabase } from '@/lib/supabase';
 import PainelLayout from '@/components/auth/PainelLayout';
-import { ShieldCheck, Users, BookOpen, Settings } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Loader2 } from 'lucide-react';
-import { UserManagement } from '@/components/admin/UserManagement';
-import { ClassManagement } from '@/components/admin/ClassManagement';
-import { SystemSettings } from '@/components/admin/SystemSettings';
+import { toast } from '@/hooks/use-toast';
+import { AdminHeader } from '@/components/admin/AdminHeader';
+import { AdminTabs } from '@/components/admin/AdminTabs';
 
 interface Usuario {
   id: string;
@@ -103,51 +99,18 @@ const PainelAdmin = () => {
 
   return (
     <PainelLayout>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2 flex items-center">
-          <ShieldCheck className="mr-2 h-6 w-6 text-purple-600" />
-          Painel de Administração
-        </h1>
-        <p className="text-gray-500">Gerencie usuários, turmas e configurações do sistema</p>
-      </div>
-
-      <Tabs defaultValue="usuarios" className="w-full">
-        <TabsList className="mb-8">
-          <TabsTrigger value="usuarios" className="flex items-center">
-            <Users className="mr-2 h-4 w-4" />
-            Usuários
-          </TabsTrigger>
-          <TabsTrigger value="turmas" className="flex items-center">
-            <BookOpen className="mr-2 h-4 w-4" />
-            Turmas
-          </TabsTrigger>
-          <TabsTrigger value="config" className="flex items-center">
-            <Settings className="mr-2 h-4 w-4" />
-            Configurações
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="usuarios">
-          <UserManagement 
-            usuarios={usuarios} 
-            loading={loading} 
-            setUsuarios={setUsuarios}
-          />
-        </TabsContent>
-
-        <TabsContent value="turmas">
-          <ClassManagement
-            turmas={turmas}
-            usuarios={usuarios}
-            turmasLoading={turmasLoading}
-            setTurmas={setTurmas}
-          />
-        </TabsContent>
-
-        <TabsContent value="config">
-          <SystemSettings />
-        </TabsContent>
-      </Tabs>
+      <AdminHeader 
+        title="Painel de Administração"
+        description="Gerencie usuários, turmas e configurações do sistema"
+      />
+      <AdminTabs
+        usuarios={usuarios}
+        turmas={turmas}
+        loading={loading}
+        turmasLoading={turmasLoading}
+        setUsuarios={setUsuarios}
+        setTurmas={setTurmas}
+      />
     </PainelLayout>
   );
 };
