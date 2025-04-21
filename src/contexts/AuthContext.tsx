@@ -56,12 +56,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Obter a sessão inicial
     const getInitialSession = async () => {
       try {
+        console.log("Buscando sessão inicial...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
+        console.log("Sessão inicial:", initialSession);
+        
         setSession(initialSession);
         setUser(initialSession?.user || null);
         
         if (initialSession?.user) {
+          console.log("Usuário encontrado na sessão:", initialSession.user.id);
           await fetchProfile(initialSession.user.id);
+        } else {
+          console.log("Nenhum usuário encontrado na sessão");
         }
       } catch (error) {
         console.error('Erro ao carregar sessão inicial:', error);
@@ -79,8 +85,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(currentSession?.user || null);
       
       if (event === 'SIGNED_IN' && currentSession?.user) {
+        console.log("Usuário fez login:", currentSession.user.id);
         await fetchProfile(currentSession.user.id);
       } else if (event === 'SIGNED_OUT') {
+        console.log("Usuário fez logout");
         setProfile(null);
       }
     });
@@ -107,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (data) {
         console.log('Perfil encontrado:', data);
+        console.log('Role do usuário:', data.role);
         setProfile(data as UserProfile);
       } else {
         console.warn('Nenhum perfil encontrado para o usuário ID:', userId);
@@ -127,12 +136,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return { error: new Error("Supabase não configurado"), data: null };
       }
 
+      console.log("Tentando login com e-mail:", email);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) {
+        console.error("Erro durante o login:", error.message);
         toast({
           title: "Erro ao fazer login",
           description: error.message,
@@ -142,6 +153,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       if (data.user) {
+        console.log("Login bem-sucedido para o usuário:", data.user.id);
         await fetchProfile(data.user.id);
         toast({
           title: "Login realizado com sucesso",
@@ -189,6 +201,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   // Calcula se o usuário é admin com base no perfil
   const isAdmin = profile?.role === 'admin';
+  
+  console.log("Estado atual de autenticação:");
+  console.log("- Usuário:", user?.id);
+  console.log("- Perfil:", profile);
+  console.log("- É admin?", isAdmin);
+  console.log("- Autenticado?", !!user);
 
   const value = {
     session,

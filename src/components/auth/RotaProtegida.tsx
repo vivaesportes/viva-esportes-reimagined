@@ -1,6 +1,6 @@
 
 import { useAuth } from "@/contexts/AuthContext";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/AuthContext";
 import { Loader2, AlertTriangle } from "lucide-react";
 import { isSupabaseConfigured } from "@/lib/supabase";
@@ -13,6 +13,12 @@ interface RotaProtegidaProps {
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   const { isAuthenticated, loading, profile, isAdmin } = useAuth();
+  const location = useLocation();
+
+  console.log("RotaProtegida - Caminho atual:", location.pathname);
+  console.log("RotaProtegida - Perfil do usuário:", profile);
+  console.log("RotaProtegida - É admin?", isAdmin);
+  console.log("RotaProtegida - Nível requerido:", nivelRequerido);
 
   // Verifica se o Supabase está configurado
   const supabaseConfigured = isSupabaseConfigured();
@@ -68,13 +74,15 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     );
   }
 
+  // Se não estiver autenticado, redireciona para o login
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    console.log("Usuário não autenticado, redirecionando para login");
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // Verifica explicitamente o nível de acesso quando é requisitado admin
+  // Rota que requer permissão de administrador
   if (nivelRequerido === 'admin' && !isAdmin) {
-    console.log("Acesso negado: Usuário não é admin. Redirecionando para /painel.");
+    console.error("Acesso negado: Usuário não é admin. Role:", profile?.role);
     return <Navigate to="/painel" replace />;
   }
 

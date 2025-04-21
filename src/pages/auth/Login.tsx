@@ -1,7 +1,7 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,30 +10,65 @@ import { motion } from "framer-motion";
 import Layout from "@/components/ui/layout/Layout";
 import Logo from "@/components/ui/Logo";
 import { Loader2, Mail, Eye, EyeOff, Lock } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
-  const { signIn, isAuthenticated } = useAuth();
+  const { signIn, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirecionar se já estiver autenticado
-  if (isAuthenticated) {
-    navigate("/painel");
-    return null;
-  }
+  // Estado para verificar se houve erro na autenticação
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const from = location.state?.from?.pathname || "/painel";
+
+  useEffect(() => {
+    // Redirecionar se já estiver autenticado
+    if (isAuthenticated) {
+      console.log("Usuário autenticado, é admin?", isAdmin);
+      // Redirecionar para o painel adequado baseado no role
+      if (isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/painel");
+      }
+    }
+  }, [isAuthenticated, isAdmin, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setErrorMessage(null);
 
     try {
       const { error } = await signIn(email, password);
-      if (!error) {
-        navigate("/painel");
+      if (error) {
+        console.error("Erro no login:", error);
+        if (error.message === "Email not confirmed") {
+          setErrorMessage("Email não confirmado. Verifique sua caixa de entrada para confirmação.");
+        } else {
+          setErrorMessage(error.message);
+        }
+        toast({
+          title: "Erro no login",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        console.log("Login bem-sucedido");
       }
+    } catch (error: any) {
+      console.error("Erro inesperado:", error);
+      setErrorMessage(error.message || "Ocorreu um erro inesperado");
+      toast({
+        title: "Erro no login",
+        description: error.message || "Ocorreu um erro inesperado",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -61,6 +96,12 @@ const Login = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {errorMessage && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md text-sm">
+                  {errorMessage}
+                </div>
+              )}
+              
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">E-mail</Label>
