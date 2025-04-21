@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -46,31 +45,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verifica se o Supabase está configurado
     if (!isSupabaseConfigured()) {
       console.warn('Supabase não está configurado com variáveis de ambiente válidas.');
       setLoading(false);
       return;
     }
 
-    // Obter a sessão inicial
     const getInitialSession = async () => {
       try {
-        console.log("Buscando sessão inicial...");
+        console.log("🔍 Buscando sessão inicial...");
         const { data: { session: initialSession } } = await supabase.auth.getSession();
-        console.log("Sessão inicial:", initialSession);
+        console.log("🔑 Sessão inicial:", initialSession);
         
         setSession(initialSession);
         setUser(initialSession?.user || null);
         
         if (initialSession?.user) {
-          console.log("Usuário encontrado na sessão:", initialSession.user.id);
+          console.log("👤 Usuário encontrado na sessão:", initialSession.user.id);
           await fetchProfile(initialSession.user.id);
         } else {
-          console.log("Nenhum usuário encontrado na sessão");
+          console.log("🚫 Nenhum usuário encontrado na sessão");
         }
       } catch (error) {
-        console.error('Erro ao carregar sessão inicial:', error);
+        console.error('❌ Erro ao carregar sessão inicial:', error);
       } finally {
         setLoading(false);
       }
@@ -78,17 +75,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     getInitialSession();
 
-    // Configurar listener para mudanças de autenticação
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
-      console.log('Evento de auth:', event);
+      console.log('🔄 Evento de auth:', event);
       setSession(currentSession);
       setUser(currentSession?.user || null);
       
       if (event === 'SIGNED_IN' && currentSession?.user) {
-        console.log("Usuário fez login:", currentSession.user.id);
+        console.log("🔓 Usuário fez login:", currentSession.user.id);
         await fetchProfile(currentSession.user.id);
       } else if (event === 'SIGNED_OUT') {
-        console.log("Usuário fez logout");
+        console.log("🚪 Usuário fez logout");
         setProfile(null);
       }
     });
@@ -100,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async (userId: string) => {
     try {
-      console.log('Buscando perfil para o usuário ID:', userId);
+      console.log('🔎 Buscando perfil para o usuário ID:', userId);
       
       const { data, error } = await supabase
         .from('profiles')
@@ -109,19 +105,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        console.error('Erro ao buscar perfil:', error.message);
+        console.error('❌ Erro ao buscar perfil:', error.message);
         throw error;
       }
 
       if (data) {
-        console.log('Perfil encontrado:', data);
-        console.log('Role do usuário:', data.role);
+        console.log('✅ Perfil encontrado:', data);
+        console.log('🔐 Role do usuário:', data.role);
         setProfile(data as UserProfile);
       } else {
-        console.warn('Nenhum perfil encontrado para o usuário ID:', userId);
+        console.warn('❓ Nenhum perfil encontrado para o usuário ID:', userId);
       }
     } catch (error: any) {
-      console.error('Erro ao buscar perfil:', error.message);
+      console.error('❌ Erro ao buscar perfil:', error.message);
     }
   };
 
@@ -208,7 +204,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   // Calcula se o usuário é admin com base no perfil
   const isAdmin = profile?.role === 'admin';
   
-  console.log("Estado atual de autenticação:");
+  console.log("🔍 Estado atual de autenticação:");
   console.log("- Usuário:", user?.id);
   console.log("- Perfil:", profile);
   console.log("- É admin?", isAdmin);
@@ -228,3 +224,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthContext;
