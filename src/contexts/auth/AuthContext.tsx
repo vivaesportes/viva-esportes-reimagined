@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -18,6 +18,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isAdmin: false,
   authError: null,
+  retryProfileFetch: async () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -28,8 +29,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const { profile, setProfile, fetchProfile, profileError } = useProfile();
+  const { profile, setProfile, fetchProfile, profileError, profileLoading } = useProfile();
   const { signIn, signOut } = useAuthActions();
+
+  // Função para tentar buscar o perfil novamente
+  const retryProfileFetch = useCallback(async () => {
+    if (!user) {
+      toast({
+        title: "Erro ao recarregar perfil",
+        description: "Você precisa estar logado para carregar seu perfil.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setLoading(true);
+    setAuthError(null);
+    console.log("🔄 Tentando carregar perfil novamente para o usuário:", user.id);
+    
+    try {
+      await fetchProfile(user.id);
+    } catch (error: any) {
+      console.error("❌ Erro ao recarregar perfil:", error.message);
+      setAuthError(`Erro ao recarregar perfil: ${error.message}`);
+      toast({
+        title: "Erro ao recarregar perfil",
+        description: error.message || "Não foi possível carregar seu perfil.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [user, fetchProfile]);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -58,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             
             try {
               // Adicionando um pequeno atraso para evitar condições de corrida
-              await new Promise(resolve => setTimeout(resolve, 500));
+              await new Promise(resolve => setTimeout(resolve, 1000));
               await fetchProfile(initialSession.user.id);
             } catch (error: any) {
               console.error("❌ Erro ao buscar perfil na inicialização:", error.message);
@@ -103,7 +134,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           
           try {
             // Adicionando um pequeno atraso para evitar condições de corrida
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             await fetchProfile(currentSession.user.id);
           } catch (error: any) {
             console.error("❌ Erro ao buscar perfil após login:", error.message);
@@ -141,19 +172,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     profileRole: profile?.role,
     calculatedIsAdmin: isAdmin,
     authenticated: !!user,
-    error: authError
+    error: authError,
+    loading: loading,
+    profileLoading: profileLoading
   });
 
   const value = {
     session,
     user,
     profile,
-    loading: loading || !authInitialized,
+    loading: loading || profileLoading || !authInitialized,
     signIn,
     signOut,
     isAuthenticated: !!user,
     isAdmin,
     authError,
+    retryProfileFetch,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

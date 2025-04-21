@@ -14,9 +14,10 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, authError } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch } = useAuth();
   const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [retrying, setRetrying] = useState(false);
 
   // Timeout para mostrar mensagem de erro se o carregamento demorar muito
   useEffect(() => {
@@ -26,6 +27,8 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
       timeoutId = setTimeout(() => {
         setLoadingTimeout(true);
       }, 5000); // 5 segundos
+    } else {
+      setLoadingTimeout(false);
     }
     
     return () => {
@@ -40,6 +43,19 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   console.log("RotaProtegida - Nível requerido:", nivelRequerido);
   console.log("RotaProtegida - Loading:", loading, "Loading timeout:", loadingTimeout);
   console.log("RotaProtegida - Erro de autenticação:", authError);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    try {
+      await retryProfileFetch();
+    } finally {
+      setRetrying(false);
+    }
+  };
+
+  const handleLogout = () => {
+    window.location.href = '/login';
+  };
 
   // Verifica se o Supabase está configurado
   const supabaseConfigured = isSupabaseConfigured();
@@ -104,15 +120,16 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
                 variant="outline" 
                 size="lg"
                 className="gap-2 items-center inline-flex"
-                onClick={() => window.location.reload()}
+                onClick={handleRetry}
+                disabled={retrying}
               >
-                <RefreshCw className="h-4 w-4" />
-                Tentar novamente
+                <RefreshCw className={`h-4 w-4 ${retrying ? 'animate-spin' : ''}`} />
+                {retrying ? 'Tentando...' : 'Tentar novamente'}
               </Button>
               <Button 
                 variant="destructive" 
                 size="lg"
-                onClick={() => window.location.href = '/login'}
+                onClick={handleLogout}
               >
                 Voltar para o login
               </Button>
@@ -134,15 +151,16 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
                   variant="outline" 
                   size="sm"
                   className="gap-1"
-                  onClick={() => window.location.reload()}
+                  onClick={handleRetry}
+                  disabled={retrying}
                 >
-                  <RefreshCw className="h-3 w-3" />
-                  Tentar novamente
+                  <RefreshCw className={`h-3 w-3 ${retrying ? 'animate-spin' : ''}`} />
+                  {retrying ? 'Tentando...' : 'Tentar novamente'}
                 </Button>
                 <Button 
                   variant="destructive" 
                   size="sm"
-                  onClick={() => window.location.href = '/login'}
+                  onClick={handleLogout}
                 >
                   Voltar para o login
                 </Button>
