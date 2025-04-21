@@ -1,15 +1,87 @@
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { Mail, Phone, Send } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/hooks/use-toast";
 
 const Contato = () => {
   // All numbers and WhatsApp links use (31) 99290-1175
   const whatsappNumber = "31992901175";
   const whatsappUrl = `https://wa.me/${whatsappNumber}`;
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData(prev => ({ ...prev, [id]: value }));
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validação básica
+    if (!formData.name || !formData.email || !formData.subject || !formData.message) {
+      toast({
+        title: "Erro ao enviar",
+        description: "Por favor, preencha todos os campos do formulário.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
+    
+    try {
+      // URL do Supabase Edge Function
+      const functionUrl = 'https://fcdxmrbiugpptquxodmx.supabase.co/functions/v1/send-gmail';
+      
+      const response = await fetch(functionUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData)
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        toast({
+          title: "Mensagem enviada!",
+          description: "Obrigado pelo contato, retornaremos em breve.",
+        });
+        
+        // Limpar formulário após envio bem-sucedido
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: ""
+        });
+      } else {
+        throw new Error(data.error || 'Erro ao enviar mensagem');
+      }
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      toast({
+        title: "Erro ao enviar",
+        description: "Ocorreu um problema ao enviar sua mensagem. Por favor, tente novamente mais tarde.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <section className="py-20 bg-viva-gray">
@@ -37,7 +109,7 @@ const Contato = () => {
             transition={{ duration: 0.6 }}
           >
             <h3 className="text-2xl font-bold mb-6">Envie uma mensagem</h3>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="name" className="block text-sm font-medium mb-1">
@@ -48,6 +120,8 @@ const Contato = () => {
                     type="text"
                     placeholder="Seu nome"
                     className="w-full"
+                    value={formData.name}
+                    onChange={handleChange}
                   />
                 </div>
                 <div>
@@ -59,6 +133,8 @@ const Contato = () => {
                     type="email"
                     placeholder="Seu e-mail"
                     className="w-full"
+                    value={formData.email}
+                    onChange={handleChange}
                   />
                 </div>
               </div>
@@ -71,6 +147,8 @@ const Contato = () => {
                   type="text"
                   placeholder="Assunto da mensagem"
                   className="w-full"
+                  value={formData.subject}
+                  onChange={handleChange}
                 />
               </div>
               <div>
@@ -82,10 +160,25 @@ const Contato = () => {
                   placeholder="Sua mensagem"
                   rows={5}
                   className="w-full"
+                  value={formData.message}
+                  onChange={handleChange}
                 />
               </div>
-              <Button className="bg-viva-blue hover:bg-viva-darkBlue text-white w-full">
-                <Send size={16} className="mr-2" /> Enviar mensagem
+              <Button 
+                className="bg-viva-blue hover:bg-viva-darkBlue text-white w-full"
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <div className="flex items-center">
+                    <span className="mr-2">Enviando...</span>
+                    <div className="h-4 w-4 border-t-2 border-r-2 border-white rounded-full animate-spin"></div>
+                  </div>
+                ) : (
+                  <>
+                    <Send size={16} className="mr-2" /> Enviar mensagem
+                  </>
+                )}
               </Button>
             </form>
           </motion.div>
