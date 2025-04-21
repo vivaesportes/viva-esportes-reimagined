@@ -5,6 +5,8 @@ import { useAuthState } from './hooks/useAuthState';
 import { useAuthStateActions } from './hooks/useAuthStateActions';
 import { useProfile } from './useProfile';
 import { useAuthActions } from './useAuthActions';
+import { toast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
 
 const AuthContext = createContext<AuthContextType>({
   session: null,
