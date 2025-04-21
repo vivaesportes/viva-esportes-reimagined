@@ -48,9 +48,9 @@ const Index = () => {
         <Modalidades />
         <Locais />
         <Galeria />
-        <HolidaysCalendar />
-        <Depoimentos />
         <Eventos />
+        <Depoimentos />
+        <HolidaysCalendar />
         <Contato />
       </div>
     </Layout>
