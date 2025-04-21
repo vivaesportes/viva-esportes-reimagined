@@ -41,9 +41,7 @@ export const getLoginRedirectOptions = () => {
   };
 };
 
-// Check if Supabase is properly configured
+// Check if Supabase is properly configured - fix type checking logic
 export function isSupabaseConfigured() {
-  return SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && 
-         SUPABASE_URL !== '' && 
-         SUPABASE_PUBLISHABLE_KEY !== '';
+  return Boolean(SUPABASE_URL) && Boolean(SUPABASE_PUBLISHABLE_KEY);
 }
