@@ -75,10 +75,7 @@ const App = () => {
                 } 
               />
               
-              <Route 
-                path="/primeiro-acesso" 
-                element={<PrimeiroAcesso />} 
-              />
+              <Route path="/primeiro-acesso" element={<PrimeiroAcesso />} />
               
               <Route path="*" element={<NotFound />} />
             </Routes>
