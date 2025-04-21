@@ -32,7 +32,10 @@ const PrimeiroAcesso = () => {
           .eq('role', 'admin')
           .limit(1);
         
-        if (error) throw error;
+        if (error) {
+          console.error('Erro ao verificar admin:', error);
+          return;
+        }
         
         if (data && data.length > 0) {
           setAdminExiste(true);
@@ -53,30 +56,46 @@ const PrimeiroAcesso = () => {
     setCarregando(true);
     
     try {
+      console.log("Iniciando criação de admin com:", { email, nome });
+      
       // 1. Criar usuário na autenticação
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password: senha,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error("Erro na autenticação:", authError);
+        throw authError;
+      }
       
       if (!authData.user) {
         throw new Error("Erro ao criar usuário");
       }
 
+      console.log("Usuário criado com sucesso:", authData.user.id);
+
       // 2. Criar o perfil com role de admin
+      const profileData = {
+        id: authData.user.id,
+        email,
+        nome,
+        role: 'admin',
+        created_at: new Date().toISOString(),
+      };
+      
+      console.log("Tentando criar perfil:", profileData);
+      
       const { error: profileError } = await supabase
         .from('profiles')
-        .upsert({
-          id: authData.user.id,
-          email,
-          nome,
-          role: 'admin',
-          created_at: new Date().toISOString(),
-        });
+        .upsert(profileData);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Erro ao criar perfil:", profileError);
+        throw profileError;
+      }
+
+      console.log("Perfil de admin criado com sucesso");
 
       toast({
         title: "Usuário Administrador Criado",
