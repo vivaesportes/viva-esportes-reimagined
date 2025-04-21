@@ -61,6 +61,17 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Viva Esportes custom colors
+				viva: {
+					blue: '#0061A8',
+					darkBlue: '#004D85',
+					red: '#E83A45',
+					darkRed: '#C92C35',
+					yellow: '#FFCF3E',
+					darkYellow: '#D9A82E',
+					gray: '#F3F4F6',
+					darkGray: '#374151',
 				}
 			},
 			borderRadius: {

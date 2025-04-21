@@ -1,5 +1,8 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
+import Layout from "@/components/ui/layout/Layout";
+import { motion } from "framer-motion";
+import { Home } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -12,15 +15,33 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
-        <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-          Return to Home
-        </a>
+    <Layout>
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="text-center px-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-[120px] md:text-[200px] font-bold text-viva-blue opacity-20 leading-none">
+              404
+            </div>
+            <h1 className="text-3xl md:text-5xl font-bold mb-4 text-viva-blue -mt-16 md:-mt-24">
+              Página não encontrada
+            </h1>
+            <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
+              Ops! A página que você está procurando não existe ou foi movida.
+            </p>
+            <Link
+              to="/"
+              className="inline-flex items-center px-6 py-3 bg-viva-red hover:bg-viva-darkRed text-white font-bold rounded-full transition-colors"
+            >
+              <Home className="mr-2" size={20} /> Voltar para o início
+            </Link>
+          </motion.div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
