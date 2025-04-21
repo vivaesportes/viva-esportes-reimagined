@@ -10,6 +10,7 @@ import Galeria from "@/components/home/Galeria";
 import Eventos from "@/components/home/Eventos";
 import Depoimentos from "@/components/home/Depoimentos";
 import Contato from "@/components/home/Contato";
+import { HolidaysCalendar } from "@/components/home/calendario/HolidaysCalendar";
 
 const Index = () => {
   const location = useLocation();
@@ -48,6 +49,7 @@ const Index = () => {
         <Modalidades />
         <Locais />
         <Galeria />
+        <HolidaysCalendar />
         <Depoimentos />
         <Eventos />
         <Contato />

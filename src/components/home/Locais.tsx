@@ -1,7 +1,6 @@
-
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
 import LocalCard from "./locais/LocalCard";
+import LocationsMap from "./locais/LocationsMap";
 
 const Locais = () => {
   const allModalidades = [
@@ -22,21 +21,21 @@ const Locais = () => {
       address:
         "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
       modalidades: allModalidades,
-      image: "/lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png", // Original image for Colégio Novos Tempos
+      image: "/lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png",
     },
     {
       id: 2,
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Ballet", "Futsal", "Vôlei"],
-      image: "/lovable-uploads/b50d3221-4c04-4d59-8f15-14faf47fd5d6.png", // New updated image for Betim
+      image: "/lovable-uploads/b50d3221-4c04-4d59-8f15-14faf47fd5d6.png",
     },
   ];
 
   return (
-    <section className="py-20 bg-white" id="locais">
+    <section className="py-20 bg-viva-gray" id="locais">
       <div className="container mx-auto px-4">
-        <motion.div
+        <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -44,39 +43,26 @@ const Locais = () => {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-5xl font-bold mb-4">
-            Onde <span className="text-viva-blue">Estamos</span>
+            Onde <span className="text-viva-yellow">Estamos</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Aulas em diversos locais da cidade para facilitar o acesso de todas
-            as crianças e adolescentes.
+            Confira nossas unidades e escolha a mais próxima de você.
           </p>
         </motion.div>
 
-        <div className="flex justify-center">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center max-w-4xl w-full">
-            {locais.map((local, index) => (
-              <LocalCard key={local.id} local={local} index={index} />
-            ))}
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          {locais.map((local, index) => (
+            <LocalCard key={local.id} local={local} index={index} />
+          ))}
         </div>
 
         <motion.div
-          className="text-center mt-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <p className="text-lg text-gray-600 mb-8">
-            Todas as nossas unidades contam com infraestrutura adequada e profissionais qualificados
-          </p>
-          <Link
-            to="/locais"
-            className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
-            onClick={() => console.log("Navigating to Locais page")}
-          >
-            Ver todos os locais
-          </Link>
+          <LocationsMap />
         </motion.div>
       </div>
     </section>
