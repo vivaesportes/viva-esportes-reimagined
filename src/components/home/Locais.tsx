@@ -29,7 +29,7 @@ const Locais = () => {
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Ballet", "Futsal", "Vôlei"],
-      image: "/lovable-uploads/03e4951d-c5d7-4b38-9f1b-06a3aa3ca031.png", // New user attached image for Betim
+      image: "/lovable-uploads/b50d3221-4c04-4d59-8f15-14faf47fd5d6.png", // New updated image for Betim
     },
   ];
 
@@ -83,3 +83,4 @@ const Locais = () => {
 };
 
 export default Locais;
+
