@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import LocalCard from "./locais/LocalCard";
 
 const Locais = () => {
@@ -69,12 +70,12 @@ const Locais = () => {
           <p className="text-lg text-gray-600 mb-8">
             Todas as nossas unidades contam com infraestrutura adequada e profissionais qualificados
           </p>
-          <a
-            href="/locais"
+          <Link
+            to="/locais"
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
           >
             Ver todos os locais
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

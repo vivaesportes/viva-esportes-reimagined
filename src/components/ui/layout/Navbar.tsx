@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import Logo from "@/components/ui/Logo";
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +61,11 @@ const Navbar = () => {
             <Link
               key={index}
               to={link.path}
-              className="font-medium text-viva-darkGray hover:text-viva-blue transition-colors"
+              className={`font-medium transition-colors ${
+                location.pathname === link.path 
+                  ? "text-viva-blue font-semibold" 
+                  : "text-viva-darkGray hover:text-viva-blue"
+              }`}
             >
               {link.title}
             </Link>
@@ -99,7 +104,11 @@ const Navbar = () => {
               <Link
                 key={index}
                 to={link.path}
-                className="font-medium text-viva-darkGray hover:text-viva-blue transition-colors py-2"
+                className={`font-medium py-2 transition-colors ${
+                  location.pathname === link.path 
+                    ? "text-viva-blue font-semibold" 
+                    : "text-viva-darkGray hover:text-viva-blue"
+                }`}
                 onClick={() => setIsOpen(false)}
               >
                 {link.title}

@@ -1,10 +1,11 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { FaVolleyballBall } from "react-icons/fa";
 import { IoMdFitness } from "react-icons/io";
 import { PiSoccerBallFill } from "react-icons/pi";
 import { IoMusicalNotes } from "react-icons/io5";
-import { IoIosBody } from "react-icons/io"; // Adicionado para Taekwondo
+import { IoIosBody } from "react-icons/io"; 
 import { Card, CardContent } from "@/components/ui/card";
 import { Activity, Dumbbell } from "lucide-react";
 
@@ -127,12 +128,12 @@ const Modalidades = () => {
           <p className="text-lg text-gray-600 mb-8">
             Todas as modalidades são adaptadas para diferentes faixas etárias e níveis de habilidade
           </p>
-          <a 
-            href="/modalidades" 
+          <Link 
+            to="/modalidades" 
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
           >
             Ver todas as modalidades
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>

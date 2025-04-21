@@ -1,5 +1,6 @@
 
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import EventoCard from "./eventos/EventoCard";
 
 const Eventos = () => {
@@ -64,12 +65,12 @@ const Eventos = () => {
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.3 }}
         >
-          <a 
-            href="/eventos" 
+          <Link 
+            to="/eventos" 
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
           >
             Ver calendário completo
-          </a>
+          </Link>
         </motion.div>
       </div>
     </section>
