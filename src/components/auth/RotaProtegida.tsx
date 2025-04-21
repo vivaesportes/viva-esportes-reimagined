@@ -14,10 +14,11 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, authError, retryProfileFetch, resetAuthState } = useAuth();
   const location = useLocation();
   const [loadingTimeout, setLoadingTimeout] = useState(false);
   const [retrying, setRetrying] = useState(false);
+  const [resetAttempted, setResetAttempted] = useState(false);
 
   // Timeout para mostrar mensagem de erro se o carregamento demorar muito
   useEffect(() => {
@@ -43,6 +44,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   console.log("RotaProtegida - Nível requerido:", nivelRequerido);
   console.log("RotaProtegida - Loading:", loading, "Loading timeout:", loadingTimeout);
   console.log("RotaProtegida - Erro de autenticação:", authError);
+  console.log("RotaProtegida - Reset tentado:", resetAttempted);
 
   const handleRetry = async () => {
     setRetrying(true);
@@ -51,6 +53,11 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     } finally {
       setRetrying(false);
     }
+  };
+
+  const handleReset = () => {
+    resetAuthState();
+    setResetAttempted(true);
   };
 
   const handleLogout = () => {
@@ -115,7 +122,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
             <p className="text-gray-600 mb-6">
               Isso pode acontecer se você está fazendo login pela primeira vez ou se houver problemas com a conexão.
             </p>
-            <div className="flex justify-center gap-4">
+            <div className="flex flex-col md:flex-row justify-center gap-4">
               <Button 
                 variant="outline" 
                 size="lg"
@@ -125,6 +132,16 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
               >
                 <RefreshCw className={`h-4 w-4 ${retrying ? 'animate-spin' : ''}`} />
                 {retrying ? 'Tentando...' : 'Tentar novamente'}
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="gap-2 items-center inline-flex"
+                onClick={handleReset}
+                disabled={resetAttempted}
+              >
+                <RefreshCw className="h-4 w-4" />
+                Resetar estado
               </Button>
               <Button 
                 variant="destructive" 
@@ -142,7 +159,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
             <AlertTriangle className="h-4 w-4" />
             <AlertTitle>Erro ao carregar perfil</AlertTitle>
             <AlertDescription>
-              Ocorreu um erro ao buscar seu perfil. Tente novamente mais tarde.
+              Ocorreu um erro ao buscar seu perfil. Tente novamente ou volte para a tela de login.
               <div className="mt-2 pt-2 border-t border-red-200">
                 <code className="text-xs opacity-70">{authError}</code>
               </div>
@@ -156,6 +173,16 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
                 >
                   <RefreshCw className={`h-3 w-3 ${retrying ? 'animate-spin' : ''}`} />
                   {retrying ? 'Tentando...' : 'Tentar novamente'}
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="gap-1"
+                  onClick={handleReset}
+                  disabled={resetAttempted}
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Resetar
                 </Button>
                 <Button 
                   variant="destructive" 

@@ -19,63 +19,45 @@ export const useProfile = () => {
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle(); // Usando maybeSingle em vez de single para evitar erros
+        .maybeSingle();
 
       if (error) {
         console.error('❌ Erro ao buscar perfil:', error.message);
+        setProfileError(`Erro ao buscar perfil: ${error.message}`);
         
-        // Se o erro não for de "não encontrado", registre e retorne o erro
-        if (error.code !== 'PGRST116') {
-          setProfileError(`Erro ao buscar perfil: ${error.message}`);
-          toast({
-            title: "Erro ao buscar perfil",
-            description: "Ocorreu um erro ao carregar seu perfil. Tentaremos criar um novo.",
-            variant: "destructive",
-          });
-          
-          // Tenta criar um perfil para o usuário mesmo assim
-          return await createProfile(userId);
-        }
-        
-        console.log('⚠️ Perfil não encontrado. Tentando criar um perfil para o usuário:', userId);
+        // Tentar criar um novo perfil
         return await createProfile(userId);
       }
 
       if (data) {
         console.log('✅ Perfil encontrado:', data);
-        console.log('🔐 Role do usuário:', data.role);
         setProfile(data as UserProfile);
         setProfileLoading(false);
         return data as UserProfile;
       } else {
-        console.warn('❓ Nenhum perfil encontrado para o usuário ID:', userId);
-        // Tenta criar um perfil para o usuário
+        console.log('⚠️ Perfil não encontrado. Criando novo perfil...');
+        // Perfil não encontrado, vamos criar um
         return await createProfile(userId);
       }
     } catch (error: any) {
       console.error('❌ Erro inesperado ao buscar perfil:', error.message);
       setProfileError(`Erro ao buscar perfil: ${error.message}`);
-      toast({
-        title: "Erro ao carregar perfil",
-        description: "Ocorreu um erro inesperado. Estamos tentando criar um novo perfil.",
-        variant: "destructive",
-      });
       
-      // Tenta criar um perfil mesmo em caso de erro inesperado
+      // Tentar criar um perfil mesmo em caso de erro inesperado
       try {
         return await createProfile(userId);
       } catch (createError: any) {
         console.error('❌ Erro também ao tentar criar perfil:', createError.message);
         setProfileError(`Erro ao criar perfil: ${createError.message}`);
         setProfileLoading(false);
-        return null;
+        throw createError;
       }
     }
   };
 
   const createProfile = async (userId: string) => {
     try {
-      console.log('🔧 Tentando criar perfil para o usuário:', userId);
+      console.log('🔧 Criando perfil para o usuário:', userId);
       setProfileLoading(true);
       
       // Busca informações do usuário
@@ -116,7 +98,7 @@ export const useProfile = () => {
           }
         ])
         .select()
-        .maybeSingle();
+        .single();
       
       if (error) {
         console.error('❌ Erro ao criar perfil:', error.message);
@@ -140,13 +122,14 @@ export const useProfile = () => {
       console.error('❌ Erro ao criar perfil:', error.message);
       setProfileError(`Erro ao criar perfil: ${error.message}`);
       setProfileLoading(false);
-      toast({
-        title: "Erro ao criar perfil",
-        description: error.message || "Ocorreu um erro ao criar seu perfil.",
-        variant: "destructive",
-      });
-      return null;
+      throw error;
     }
+  };
+
+  const clearProfile = () => {
+    setProfile(null);
+    setProfileError(null);
+    setProfileLoading(false);
   };
 
   return { 
@@ -155,6 +138,7 @@ export const useProfile = () => {
     fetchProfile, 
     profileError, 
     profileLoading,
-    createProfile 
+    createProfile,
+    clearProfile
   };
 };

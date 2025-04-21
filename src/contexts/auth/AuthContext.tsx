@@ -19,6 +19,7 @@ const AuthContext = createContext<AuthContextType>({
   isAdmin: false,
   authError: null,
   retryProfileFetch: async () => {},
+  resetAuthState: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -29,7 +30,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [authInitialized, setAuthInitialized] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
-  const { profile, setProfile, fetchProfile, profileError, profileLoading } = useProfile();
+  const { 
+    profile, 
+    setProfile, 
+    fetchProfile, 
+    profileError, 
+    profileLoading, 
+    clearProfile 
+  } = useProfile();
   const { signIn, signOut } = useAuthActions();
 
   // Função para tentar buscar o perfil novamente
@@ -49,18 +57,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     try {
       await fetchProfile(user.id);
+      setLoading(false);
     } catch (error: any) {
       console.error("❌ Erro ao recarregar perfil:", error.message);
       setAuthError(`Erro ao recarregar perfil: ${error.message}`);
+      setLoading(false);
       toast({
         title: "Erro ao recarregar perfil",
         description: error.message || "Não foi possível carregar seu perfil.",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   }, [user, fetchProfile]);
+
+  const resetAuthState = useCallback(() => {
+    setSession(null);
+    setUser(null);
+    clearProfile();
+    setAuthError(null);
+    setLoading(false);
+    console.log("🔄 Estado de autenticação resetado");
+  }, [clearProfile]);
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -88,8 +105,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.log("👤 Usuário encontrado na sessão:", initialSession.user.id);
             
             try {
-              // Adicionando um pequeno atraso para evitar condições de corrida
-              await new Promise(resolve => setTimeout(resolve, 1000));
               await fetchProfile(initialSession.user.id);
             } catch (error: any) {
               console.error("❌ Erro ao buscar perfil na inicialização:", error.message);
@@ -133,8 +148,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(true);
           
           try {
-            // Adicionando um pequeno atraso para evitar condições de corrida
-            await new Promise(resolve => setTimeout(resolve, 1000));
             await fetchProfile(currentSession.user.id);
           } catch (error: any) {
             console.error("❌ Erro ao buscar perfil após login:", error.message);
@@ -155,7 +168,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isMounted = false;
       subscription.unsubscribe();
     };
-  }, [fetchProfile]);
+  }, [fetchProfile, setProfile, clearProfile]);
 
   useEffect(() => {
     // Se houver erro no perfil, armazena-o como erro de autenticação
@@ -166,15 +179,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const isAdmin = profile?.role === 'admin';
   
-  console.log("🔍 Estado atual de autenticação (isAdmin calculado):", {
+  console.log("🔍 Estado atual de autenticação:", {
     userId: user?.id,
     profileId: profile?.id,
     profileRole: profile?.role,
-    calculatedIsAdmin: isAdmin,
+    isAdmin,
     authenticated: !!user,
     error: authError,
-    loading: loading,
-    profileLoading: profileLoading
+    loading: loading || profileLoading || !authInitialized
   });
 
   const value = {
@@ -188,6 +200,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin,
     authError,
     retryProfileFetch,
+    resetAuthState,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
