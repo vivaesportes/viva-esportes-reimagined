@@ -69,11 +69,11 @@ const Hero = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-5 -right-5 w-32 h-32 bg-white rounded-full overflow-hidden border-4 border-white flex items-center justify-center">
+              <div className="absolute -bottom-5 -right-5 w-36 h-36 bg-white rounded-full overflow-hidden border-4 border-white flex items-center justify-center">
                 <img
                   src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
                   alt="Logo Viva Esportes"
-                  className="w-28 h-28 object-contain"
+                  className="w-32 h-32 object-contain"
                 />
               </div>
             </div>
