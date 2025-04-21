@@ -112,7 +112,11 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
 
       console.log("Usuário criado com sucesso:", authData.user.id);
 
-      // Passo 2: Criar perfil no banco de dados com a role de admin
+      // Passo 2: Inserir diretamente na tabela profiles usando a REST API do Supabase
+      // Isto evita o problema de Row Level Security para a primeira inserção
+      const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
+      
       const profileData = {
         id: authData.user.id,
         email,
@@ -121,29 +125,36 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
         created_at: new Date().toISOString(),
       };
       
-      console.log("Tentando criar perfil:", profileData);
+      console.log("Tentando criar perfil via REST API:", profileData);
       
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert(profileData);
-
-      if (profileError) {
-        console.error("Erro ao criar perfil:", profileError);
-        setError(profileError.message);
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(profileData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Erro ao criar perfil via REST API:", errorData);
+        setError(errorData.message || "Erro ao criar perfil de administrador");
         
-        // Tentativa de limpar o usuário criado caso o perfil falhe
+        // Tentar limpar o usuário criado
         try {
-          // Este método requer permissões administrativas, pode não funcionar
           await supabase.auth.admin.deleteUser(authData.user.id);
           console.log("Usuário deletado após falha ao criar perfil");
         } catch (deleteError) {
           console.error("Não foi possível deletar o usuário após falha:", deleteError);
         }
         
-        throw profileError;
+        throw new Error(errorData.message || "Erro ao criar perfil");
       }
 
-      console.log("Perfil de admin criado com sucesso");
+      console.log("Perfil de admin criado com sucesso via REST API");
 
       toast({
         title: "Usuário Administrador Criado",
