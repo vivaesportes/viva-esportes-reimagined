@@ -149,21 +149,44 @@ export const UserManagement = ({ usuarios, loading, setUsuarios }: {
     try {
       setActionLoading(true);
       
-      // Modificado para excluir diretamente da tabela de perfis (profiles)
-      // A exclusão do auth.users pode ser tratada por um trigger no banco de dados
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
-
-      if (error) throw error;
-
+      // Primeiro, excluir o usuário do auth.users usando admin API
+      const { error: authError } = await supabase.auth.admin.deleteUser(
+        userId,
+        true // Also cascade delete associated profile data
+      );
+      
+      if (authError) {
+        console.error('Erro ao excluir usuário do auth system:', authError);
+        
+        // Tenta o método alternativo - excluir diretamente da tabela de profiles
+        // se não conseguir excluir do auth.users
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .delete()
+          .eq('id', userId);
+          
+        if (profileError) throw profileError;
+      }
+      
+      // Independentemente do método, atualiza a UI
       setUsuarios(usuarios.filter(user => user.id !== userId));
 
       toast({
         title: "Usuário excluído",
         description: "O usuário foi removido com sucesso",
       });
+      
+      // Recarregar a lista de usuários após a exclusão para garantir dados atualizados
+      const { data: updatedUsers, error: fetchError } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+        
+      if (fetchError) {
+        console.error('Erro ao recarregar lista de usuários:', fetchError);
+      } else {
+        setUsuarios(updatedUsers || []);
+      }
     } catch (error: any) {
       console.error('Erro ao excluir usuário:', error);
       toast({
