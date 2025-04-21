@@ -7,15 +7,24 @@ const Locais = () => {
     {
       id: 1,
       name: "Colégio Novos Tempos",
-      address: "Av. Principal, 123 - Centro",
-      modalidades: ["Futsal", "Vôlei", "Funcional"],
+      address: "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
+      modalidades: [
+        "Futsal",
+        "Vôlei",
+        "Atletismo",
+        "Funcional",
+        "Ballet",
+        "Jazz",
+        "Taekwondo",
+        "Muay Thai"
+      ],
       image: "/placeholder.svg"
     },
     {
       id: 2,
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
-      modalidades: ["Futsal", "Vôlei", "Atletismo", "Funcional"],
+      modalidades: ["Ballet", "Futsal", "Vôlei"],
       image: "/placeholder.svg"
     }
   ];
