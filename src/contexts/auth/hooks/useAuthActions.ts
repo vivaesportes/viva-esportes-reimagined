@@ -1,6 +1,5 @@
 
-import { supabase, getLoginRedirectOptions } from '@/lib/supabase';
-import { isSupabaseConfigured } from '@/lib/supabase';
+import { supabase, getLoginRedirectOptions, isSupabaseConfigured } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 
 export const useAuthActions = () => {

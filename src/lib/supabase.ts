@@ -8,6 +8,27 @@ export function isSupabaseConfigured() {
   return supabaseUrl && supabaseAnonKey && supabaseUrl !== 'YOUR_SUPABASE_URL' && supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY';
 }
 
+// Helper function to get the correct site URL for redirects
+export const getSiteUrl = () => {
+  // Production detection - add more domains as needed
+  const isProd = window.location.hostname === 'vivaesportes.com.br';
+  const productionUrl = 'https://vivaesportes.com.br';
+  
+  // Development or preview URL
+  const developmentUrl = window.location.origin;
+  
+  console.log("Environment detection:", { isProd, url: isProd ? productionUrl : developmentUrl });
+  return isProd ? productionUrl : developmentUrl;
+};
+
+// Get login redirect options - used for auth providers that require redirects
+export const getLoginRedirectOptions = () => {
+  const baseUrl = getSiteUrl();
+  return {
+    redirectTo: `${baseUrl}/login`,
+  };
+};
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storageKey: 'viva_auth_token',
