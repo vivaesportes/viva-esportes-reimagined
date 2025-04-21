@@ -2,22 +2,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Obtém as variáveis de ambiente do Supabase
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder-url.supabase.co';
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
-
-// Verifica se as variáveis de ambiente estão definidas e loga avisos
-if (!import.meta.env.VITE_SUPABASE_URL) {
-  console.error('ERRO: VITE_SUPABASE_URL não está definida no ambiente.');
-}
-
-if (!import.meta.env.VITE_SUPABASE_ANON_KEY) {
-  console.error('ERRO: VITE_SUPABASE_ANON_KEY não está definida no ambiente.');
-}
+const supabaseUrl = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
 
 // Cria o cliente Supabase com valores válidos
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Adiciona uma função para verificar se o Supabase está configurado corretamente
 export const isSupabaseConfigured = () => {
-  return !!import.meta.env.VITE_SUPABASE_URL && !!import.meta.env.VITE_SUPABASE_ANON_KEY;
+  return !!supabaseUrl && !!supabaseAnonKey;
 };

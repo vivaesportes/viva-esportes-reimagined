@@ -40,7 +40,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
             </p>
             <ol className="list-decimal list-inside space-y-2 text-gray-700">
               <li>Acesse seu projeto no <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Supabase</a></li>
-              <li>Vá para <strong>Settings &gt; API</strong></li>
+              <li>Vá para <strong>Settings > API</strong></li>
               <li>Copie a <strong>Project URL</strong> (para VITE_SUPABASE_URL)</li>
               <li>Copie a <strong>anon public</strong> key (para VITE_SUPABASE_ANON_KEY)</li>
               <li>Configure essas variáveis no seu projeto Lovable</li>
