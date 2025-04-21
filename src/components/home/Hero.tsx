@@ -40,7 +40,7 @@ const Hero = () => {
               <Button className="bg-viva-red hover:bg-viva-darkRed text-white text-lg px-8 py-6 rounded-full">
                 Matricule-se
               </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white/10 text-lg px-8 py-6 rounded-full">
+              <Button variant="outline" className="border-white text-red hover:bg-white/10 text-lg px-8 py-6 rounded-full">
                 Conheça as Modalidades
               </Button>
             </div>
