@@ -32,7 +32,7 @@ const Hero = () => {
   const photos = [
     {
       src: "/lovable-uploads/78301558-7861-47ea-9d92-83fa4e88a8ce.png", // futebol, garoto vermelho centralizado
-      style: { objectPosition: "50% 40%" }, // Centralizado no eixo horizontal
+      style: { objectPosition: "55% 40%" }, // Um pouco mais à direita do centro
       alt: "Foto Esporte Garoto Vermelho"
     },
     {
