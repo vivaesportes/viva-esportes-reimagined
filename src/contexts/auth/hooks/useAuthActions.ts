@@ -59,7 +59,7 @@ export const useAuthActions = () => {
     }
   };
 
-  const signOut = async () => {
+  const signOut = async (): Promise<void> => {
     try {
       if (!isSupabaseConfigured()) {
         toast({
@@ -90,8 +90,6 @@ export const useAuthActions = () => {
         title: "Logout realizado com sucesso",
         description: "Você foi desconectado",
       });
-      
-      return true;
     } catch (error: any) {
       console.error('Erro ao fazer logout:', error);
       toast({
@@ -99,7 +97,6 @@ export const useAuthActions = () => {
         description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
-      return false;
     }
   };
 
