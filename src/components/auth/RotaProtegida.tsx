@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { UserRole } from "@/contexts/auth/AuthProvider";
+import { UserRole } from "@/contexts/auth/types";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, resetAuth } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, resetAuthState } = useAuth();
   const location = useLocation();
   const [showDebug, setShowDebug] = useState(false);
   const [longWait, setLongWait] = useState(false);
@@ -58,7 +58,7 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
               </Button>
               <Button 
                 variant="destructive" 
-                onClick={resetAuth}
+                onClick={resetAuthState}
               >
                 Resetar autenticação
               </Button>

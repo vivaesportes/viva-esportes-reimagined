@@ -35,8 +35,6 @@ const Navbar = () => {
             
             {isMenuOpen && (
               <NavbarMobileMenu
-                isAuthenticated={isAuthenticated}
-                profileName={profile?.nome?.split(' ')[0]}
                 onClose={closeMenu}
               />
             )}

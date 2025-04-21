@@ -58,6 +58,5 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Reexporte o hook useAuth
-export { AuthContext, type AuthContextType };
+export { AuthContext };
 export const useAuth = () => React.useContext(AuthContext);
