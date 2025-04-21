@@ -16,7 +16,8 @@ import {
   Plus,
   Edit,
   Lock,
-  Unlock
+  Unlock,
+  BookOpen
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
