@@ -4,10 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import WhatsAppButton from "../WhatsAppButton";
-
-interface LayoutProps {
-  children: React.ReactNode;
-}
+import Logo from "@/components/ui/Logo"; // Import the Logo component
 
 const Layout = ({ children }: LayoutProps) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -33,7 +30,10 @@ const Layout = ({ children }: LayoutProps) => {
             className="fixed inset-0 z-50 flex items-center justify-center bg-white"
           >
             <div className="text-center">
-              <div className="w-24 h-24 bg-viva-blue rounded-full mx-auto mb-4 animate-bounce"></div>
+              <Logo 
+                size={128} 
+                className="mx-auto mb-4 animate-bounce" 
+              />
               <h1 className="text-3xl font-bold text-viva-blue">
                 Viva<span className="text-viva-red">Esportes</span>
               </h1>
