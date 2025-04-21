@@ -10,13 +10,14 @@ export const useLoadingTimeout = (loading: boolean) => {
     let longTimeoutId: NodeJS.Timeout;
     
     if (loading) {
+      // Reduz o tempo para mensagens de feedback
       timeoutId = setTimeout(() => {
         setLoadingTimeout(true);
-      }, 3000);
+      }, 1500);
       
       longTimeoutId = setTimeout(() => {
         setLongLoadingTimeout(true);
-      }, 10000);
+      }, 5000);
     } else {
       setLoadingTimeout(false);
       setLongLoadingTimeout(false);

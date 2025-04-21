@@ -5,6 +5,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import WhatsAppButton from "../WhatsAppButton";
 import Logo from "@/components/ui/Logo";
+import { useLoadingTimeout } from "@/hooks/useLoadingTimeout";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -12,14 +13,27 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   const [isLoading, setIsLoading] = useState(true);
+  const { loadingTimeout, longLoadingTimeout } = useLoadingTimeout(isLoading);
 
   useEffect(() => {
+    // Reduz o tempo de carregamento de 1000ms para 500ms
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 1000);
+    }, 500);
 
-    return () => clearTimeout(timer);
-  }, []);
+    // Failsafe: garante que o loading será encerrado mesmo se algo der errado
+    const failsafeTimer = setTimeout(() => {
+      if (isLoading) {
+        console.log("Carregamento forçado a terminar pelo failsafe");
+        setIsLoading(false);
+      }
+    }, 3000);
+
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(failsafeTimer);
+    };
+  }, [isLoading]);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -40,7 +54,13 @@ const Layout = ({ children }: LayoutProps) => {
               <h1 className="text-3xl font-bold text-viva-blue">
                 Viva<span className="text-viva-red">Esportes</span>
               </h1>
-              <p className="text-gray-500 mt-2">Carregando...</p>
+              <p className="text-gray-500 mt-2">
+                {longLoadingTimeout 
+                  ? "Aguarde, estamos finalizando o carregamento..." 
+                  : loadingTimeout 
+                    ? "Quase lá..." 
+                    : "Carregando..."}
+              </p>
             </div>
           </motion.div>
         ) : (
