@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Logo from "@/components/ui/Logo";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -40,8 +41,9 @@ const Navbar = () => {
       }`}
     >
       <div className="container mx-auto px-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center">
-          <span className="text-2xl font-bold">
+        <Link to="/" className="flex items-center space-x-2">
+          <Logo size={48} className="min-w-[40px] max-w-[52px] h-auto" />
+          <span className="text-2xl font-bold flex items-end gap-1 select-none">
             <span className="text-viva-blue">Viva</span>
             <span className="text-viva-red">Esportes</span>
           </span>
@@ -104,4 +106,3 @@ const Navbar = () => {
 };
 
 export default Navbar;
-
