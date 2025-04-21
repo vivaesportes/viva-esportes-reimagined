@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { UserRole } from "@/contexts/auth/types";
@@ -24,7 +25,8 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     retryProfileFetch, 
     authError,
     databaseCheck,
-    checkingDatabase
+    checkingDatabase,
+    signOut
   } = useAuth();
   
   const location = useLocation();
@@ -67,7 +69,8 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
   };
 
   const handleForceLogout = async () => {
-    await supabase.auth.signOut();
+    console.log("Forçando logout...");
+    await signOut();
     window.location.href = '/login';
   };
 

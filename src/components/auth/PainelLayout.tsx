@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useAuth } from '@/contexts/auth/AuthContext';
+import { useAuth } from '@/contexts/auth/AuthProvider';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from '@/components/ui/Logo';
@@ -17,7 +17,8 @@ const PainelLayout: React.FC<PainelLayoutProps> = ({ children }) => {
 
   const handleLogout = async () => {
     await signOut();
-    navigate('/login');
+    // Force redirect to ensure complete logout
+    window.location.href = '/login';
   };
 
   return (

@@ -24,14 +24,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     profile: profileFromHook,
     fetchProfile,
     profileError,
-    profileLoading
+    profileLoading,
+    clearProfile
   } = useProfile();
 
   const { databaseCheck, checkingDatabase, checkProfileInDatabase } = useDatabaseCheck();
-  const { signIn, signOut } = useAuthActions();
+  const { signIn, signOut: authSignOut } = useAuthActions();
 
   // Use o perfil do estado ou do hook
   const profile = stateProfile || profileFromHook;
+
+  // Enhanced signOut function that clears all state
+  const signOut = async () => {
+    console.log("Executando logout completo...");
+    
+    // Clear profile first
+    clearProfile();
+    setProfile(null);
+    
+    // Then perform auth signOut
+    const result = await authSignOut();
+    
+    console.log("Logout completo executado.");
+    return result;
+  };
 
   // Attempt to load profile when user is available
   useEffect(() => {
@@ -95,6 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [user, profile, profileLoading, authLoading, checkProfileInDatabase, fetchProfile, setProfile]);
 
   const resetAuthState = () => {
+    clearProfile();
     setProfile(null);
     signOut();
   };

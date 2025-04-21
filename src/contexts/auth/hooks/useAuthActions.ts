@@ -69,19 +69,37 @@ export const useAuthActions = () => {
         });
         return;
       }
-
-      await supabase.auth.signOut();
+      
+      console.log("Iniciando processo de logout...");
+      
+      // Executa o logout no Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        throw error;
+      }
+      
+      console.log("Logout concluído com sucesso no Supabase");
+      
+      // Limpar qualquer dado de autenticação persistente
+      localStorage.removeItem('viva_auth_token');
+      localStorage.removeItem('supabase.auth.token');
+      
+      // Informar usuário do logout bem-sucedido
       toast({
         title: "Logout realizado com sucesso",
         description: "Você foi desconectado",
       });
-    } catch (error) {
+      
+      return true;
+    } catch (error: any) {
       console.error('Erro ao fazer logout:', error);
       toast({
         title: "Erro ao fazer logout",
-        description: "Ocorreu um erro inesperado",
+        description: error.message || "Ocorreu um erro inesperado",
         variant: "destructive",
       });
+      return false;
     }
   };
 
