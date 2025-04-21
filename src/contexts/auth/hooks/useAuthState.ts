@@ -14,7 +14,7 @@ export const useAuthState = () => {
 
   useEffect(() => {
     let isMounted = true;
-    let authListener: { subscription: { unsubscribe: () => void } } | null = null;
+    let authListenerSubscription: { unsubscribe: () => void } | null = null;
     
     const initializeAuth = async () => {
       try {
@@ -23,7 +23,7 @@ export const useAuthState = () => {
         setAuthError(null);
         
         // First set up the auth state change listener
-        authListener = supabase.auth.onAuthStateChange((event, currentSession) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, currentSession) => {
           console.log('🔄 Evento de auth:', event, 'na URL:', window.location.href);
           
           if (isMounted) {
@@ -38,6 +38,9 @@ export const useAuthState = () => {
             }
           }
         });
+        
+        // Store the subscription for cleanup
+        authListenerSubscription = subscription;
         
         // Then check for the current session
         const { data: { session: initialSession }, error } = await supabase.auth.getSession();
@@ -66,8 +69,8 @@ export const useAuthState = () => {
 
     return () => {
       isMounted = false;
-      if (authListener) {
-        authListener.subscription.unsubscribe();
+      if (authListenerSubscription) {
+        authListenerSubscription.unsubscribe();
       }
     };
   }, []);
