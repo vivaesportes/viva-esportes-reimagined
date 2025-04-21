@@ -24,6 +24,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Add exact path matching to make sure we can identify active links properly
   const navLinks = [
     { title: "Início", path: "/" },
     { title: "Modalidades", path: "/modalidades" },
@@ -66,6 +67,7 @@ const Navbar = () => {
                   ? "text-viva-blue font-semibold" 
                   : "text-viva-darkGray hover:text-viva-blue"
               }`}
+              onClick={() => console.log(`Navigating to: ${link.path}`)}
             >
               {link.title}
             </Link>
@@ -109,7 +111,10 @@ const Navbar = () => {
                     ? "text-viva-blue font-semibold" 
                     : "text-viva-darkGray hover:text-viva-blue"
                 }`}
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  console.log(`Mobile navigating to: ${link.path}`);
+                  setIsOpen(false);
+                }}
               >
                 {link.title}
               </Link>

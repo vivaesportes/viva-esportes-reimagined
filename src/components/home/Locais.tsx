@@ -34,7 +34,7 @@ const Locais = () => {
   ];
 
   return (
-    <section className="py-20 bg-white">
+    <section className="py-20 bg-white" id="locais">
       <div className="container mx-auto px-4">
         <motion.div
           className="text-center mb-16"
@@ -73,6 +73,7 @@ const Locais = () => {
           <Link
             to="/locais"
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
+            onClick={() => console.log("Navigating to Locais page")}
           >
             Ver todos os locais
           </Link>
@@ -83,4 +84,3 @@ const Locais = () => {
 };
 
 export default Locais;
-

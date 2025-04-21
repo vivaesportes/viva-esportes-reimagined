@@ -77,7 +77,7 @@ const Modalidades = () => {
   ];
 
   return (
-    <section className="py-20 bg-gray-50">
+    <section className="py-20 bg-gray-50" id="modalidades">
       <div className="container mx-auto px-4">
         <motion.div 
           className="text-center mb-16"
@@ -131,6 +131,7 @@ const Modalidades = () => {
           <Link 
             to="/modalidades" 
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
+            onClick={() => console.log("Navigating to Modalidades page")}
           >
             Ver todas as modalidades
           </Link>

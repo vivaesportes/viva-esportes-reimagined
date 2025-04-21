@@ -32,8 +32,9 @@ const HeroCTA = ({ whatsappUrl, fadeUpVariants }: HeroCTAProps) => {
         variant="outline"
         size="lg"
         className="border-white text-white font-bold px-9 py-5 rounded-full hover-scale transition-all text-lg hover:bg-viva-blue/25 bg-white/10 flex items-center justify-center gap-3"
+        asChild
       >
-        <Link to="/modalidades">
+        <Link to="/modalidades" onClick={() => console.log("HeroCTA - Navigating to Modalidades page")}>
           Modalidades <span className="inline-block animate-bounce">🏅</span>
         </Link>
       </Button>
