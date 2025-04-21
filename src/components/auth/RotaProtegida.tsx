@@ -33,6 +33,9 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
     const verificarSessao = async () => {
       try {
         console.log("RotaProtegida - Verificando sessão atual...");
+        console.log("URL atual:", window.location.href);
+        console.log("Hostname:", window.location.hostname);
+        
         const { data } = await supabase.auth.getSession();
         console.log("RotaProtegida - Sessão atual:", data.session);
         

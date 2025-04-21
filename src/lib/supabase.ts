@@ -7,8 +7,14 @@ const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 
 // Configura as URLs com base no ambiente atual
 const getSiteUrl = () => {
+  // Verifica se estamos em produção (vivaesportes.com.br)
+  if (window.location.hostname === 'vivaesportes.com.br') {
+    return 'https://vivaesportes.com.br';
+  }
+  
+  // Para desenvolvimento local ou ambiente Lovable
   const currentUrl = window.location.origin;
-  console.log("URL atual:", currentUrl);
+  console.log("URL atual detectada:", currentUrl);
   return currentUrl;
 };
 
@@ -25,7 +31,10 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 
 // Adiciona uma função para configurar o site de redirecionamento
 export const getRedirectUrl = () => {
-  return `${getSiteUrl()}/login`;
+  const siteUrl = getSiteUrl();
+  const redirectUrl = `${siteUrl}/login`;
+  console.log("URL de redirecionamento configurada:", redirectUrl);
+  return redirectUrl;
 };
 
 // Função para usar no processo de login

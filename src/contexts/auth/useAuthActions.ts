@@ -16,7 +16,9 @@ export const useAuthActions = () => {
       }
 
       console.log("Tentando login com e-mail:", email);
-      // Não estamos usando a opção redirectTo aqui no login com senha
+      console.log("URL de redirecionamento:", getLoginRedirectOptions().redirectTo);
+      
+      // Tentar login com e-mail e senha
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
