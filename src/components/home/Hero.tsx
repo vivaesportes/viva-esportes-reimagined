@@ -73,7 +73,7 @@ const Hero = () => {
                 <img
                   src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
                   alt="Logo Viva Esportes"
-                  className="w-24 h-24 object-contain"
+                  className="w-28 h-28 object-contain"
                 />
               </div>
             </div>
