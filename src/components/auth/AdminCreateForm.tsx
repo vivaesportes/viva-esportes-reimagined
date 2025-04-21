@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,86 +7,27 @@ import { Label } from '@/components/ui/label';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import FormError from './FormError';
+import { useAdminForm } from '@/hooks/useAdminForm';
+import { useCooldown } from '@/hooks/useCooldown';
+import { checkProfileExists } from '@/hooks/useProfileCheck';
 
 interface AdminCreateFormProps {
   onSuccess?: () => void;
 }
 
 const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [senha, setSenha] = useState('');
+  const { formData, updateField, validateForm } = useAdminForm();
+  const { cooldown, cooldownTimer, startCooldown } = useCooldown();
   const [carregando, setCarregando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cooldown, setCooldown] = useState(false);
-  const [cooldownTimer, setCooldownTimer] = useState(0);
   const navigate = useNavigate();
 
-  // Handle cooldown timer if needed
-  useEffect(() => {
-    let interval: number | undefined;
-    
-    if (cooldown && cooldownTimer > 0) {
-      interval = setInterval(() => {
-        setCooldownTimer((prev) => {
-          if (prev <= 1) {
-            setCooldown(false);
-            clearInterval(interval);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000) as unknown as number;
-    }
-    
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [cooldown, cooldownTimer]);
-
   const handleRateLimitError = (message: string) => {
-    // Extract the seconds from the error message if possible
     const secondsMatch = message.match(/(\d+) second/);
-    let waitTime = 30; // Default fallback
-    
-    if (secondsMatch && secondsMatch[1]) {
-      waitTime = parseInt(secondsMatch[1], 10);
-    }
-    
-    setCooldown(true);
-    setCooldownTimer(waitTime);
+    const waitTime = secondsMatch && secondsMatch[1] ? parseInt(secondsMatch[1], 10) : 30;
+    startCooldown(waitTime);
     setError(`Por favor, aguarde ${waitTime} segundos antes de tentar novamente.`);
-  };
-
-  // Verificar se o profile já existe
-  const checkProfileExists = async (userId: string) => {
-    try {
-      const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
-      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
-      
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${userId}&select=id`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': SUPABASE_KEY,
-          'Authorization': `Bearer ${SUPABASE_KEY}`
-        }
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Erro ao verificar perfil: ${response.statusText}`);
-      }
-      
-      const data = await response.json();
-      
-      // Se encontrar um perfil, retorna true
-      return data && data.length > 0;
-    } catch (error) {
-      console.error("Erro ao verificar perfil:", error);
-      return false;
-    }
   };
 
   const criarPrimeiroAdmin = async (e: React.FormEvent) => {
@@ -100,20 +41,25 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       });
       return;
     }
+
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
     
     setCarregando(true);
     setError(null);
     
     try {
-      console.log("Iniciando criação de admin com:", { email, nome });
+      console.log("Iniciando criação de admin com:", { email: formData.email, nome: formData.nome });
       
-      // Passo 1: Criar usuário na autenticação do Supabase
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password: senha,
+        email: formData.email,
+        password: formData.senha,
         options: {
           data: {
-            nome,
+            nome: formData.nome,
             role: 'admin',
           },
         },
@@ -122,7 +68,6 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       if (authError) {
         console.error("Erro na autenticação:", authError);
         
-        // Handle rate limiting error
         if (authError.message.includes("security purposes") || 
             authError.code === "over_email_send_rate_limit") {
           handleRateLimitError(authError.message);
@@ -134,118 +79,37 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       }
       
       if (!authData.user) {
-        const errorMsg = "Erro ao criar usuário";
-        setError(errorMsg);
-        throw new Error(errorMsg);
+        throw new Error("Erro ao criar usuário");
       }
 
-      console.log("Usuário criado com sucesso:", authData.user.id);
-      
-      // Verificar se já existe um perfil com este ID (pode ocorrer devido ao trigger de criação de perfil)
+      // Verificar se já existe um perfil
       const profileExists = await checkProfileExists(authData.user.id);
       
-      if (profileExists) {
-        console.log("Perfil já existe, atualizando para admin");
-        
-        // Usar API REST para atualizar o perfil para admin
-        const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
-        
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.user.id}`, {
-          method: 'PATCH',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({
-            role: 'admin',
-            nome,
-            email
-          })
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Erro ao atualizar perfil para admin");
-        }
-        
-        console.log("Perfil atualizado para admin com sucesso");
-      } else {
-        // Passo 2: Inserir diretamente na tabela profiles usando a REST API do Supabase
-        // Isto evita o problema de Row Level Security para a primeira inserção
-        const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
-        
-        const profileData = {
-          id: authData.user.id,
-          email,
-          nome,
-          role: 'admin',
-          created_at: new Date().toISOString(),
-        };
-        
-        console.log("Tentando criar perfil via REST API:", profileData);
-        
-        try {
-          const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': SUPABASE_KEY,
-              'Authorization': `Bearer ${SUPABASE_KEY}`,
-              'Prefer': 'return=minimal'
-            },
-            body: JSON.stringify(profileData)
-          });
-          
-          if (!response.ok) {
-            // Se for erro de chave duplicada, significa que o perfil já existe
-            if (response.status === 409 || (await response.text()).includes('profiles_pkey')) {
-              console.log("Perfil já existe no banco, fazendo update para admin");
-              
-              // Tentar atualizar o perfil para admin
-              const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/profiles?id=eq.${authData.user.id}`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'apikey': SUPABASE_KEY,
-                  'Authorization': `Bearer ${SUPABASE_KEY}`,
-                  'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify({
-                  role: 'admin',
-                  nome,
-                  email
-                })
-              });
-              
-              if (!updateResponse.ok) {
-                throw new Error("Erro ao atualizar perfil para admin");
-              }
-              
-              console.log("Perfil atualizado para admin com sucesso");
-            } else {
-              throw new Error("Erro ao criar perfil de administrador");
-            }
-          } else {
-            console.log("Perfil de admin criado com sucesso via REST API");
-          }
-        } catch (profileError: any) {
-          console.error("Erro ao criar/atualizar perfil:", profileError);
-          
-          // Se não conseguiu criar o perfil, tenta deletar o usuário
-          try {
-            console.log("Tentando deletar usuário após falha no perfil");
-            await supabase.auth.admin.deleteUser(authData.user.id);
-            console.log("Usuário deletado após falha ao criar perfil");
-          } catch (deleteError) {
-            console.error("Não foi possível deletar o usuário após falha:", deleteError);
-          }
-          
-          throw profileError;
-        }
+      // REST API constants
+      const SUPABASE_URL = "https://tgxmuqvwwkxugvyspcwn.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRneG11cXZ3d2t4dWd2eXNwY3duIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUyNjA1MDUsImV4cCI6MjA2MDgzNjUwNX0.dImvfAModlvq8rqduR_5FOy-K4vDF22ko_uy6OiRc-0";
+      
+      const profileData = {
+        id: authData.user.id,
+        email: formData.email,
+        nome: formData.nome,
+        role: 'admin',
+        created_at: new Date().toISOString(),
+      };
+
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles${profileExists ? `?id=eq.${authData.user.id}` : ''}`, {
+        method: profileExists ? 'PATCH' : 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(profileExists ? { role: 'admin', nome: formData.nome } : profileData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao criar/atualizar perfil de administrador");
       }
 
       toast({
@@ -253,7 +117,6 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
         description: "Faça login com suas novas credenciais",
       });
 
-      // Redirecionar para a página de login
       navigate('/login');
       onSuccess?.();
 
@@ -261,22 +124,12 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
       console.error('Erro ao criar admin:', error);
       
       if (!cooldown) {
-        // Tratamento especial para erro de chave duplicada (perfil já existe)
-        if (error.message?.includes('profiles_pkey') || error.message?.includes('duplicate key')) {
-          setError("Um perfil com este ID já existe. Tente fazer login ou use outro email.");
-          toast({
-            title: "Usuário já existe",
-            description: "Um perfil com este email já existe. Tente fazer login.",
-            variant: "destructive",
-          });
-        } else {
-          setError(error.message || "Ocorreu um erro inesperado");
-          toast({
-            title: "Erro ao criar usuário",
-            description: error.message || "Ocorreu um erro inesperado",
-            variant: "destructive",
-          });
-        }
+        setError(error.message || "Ocorreu um erro inesperado");
+        toast({
+          title: "Erro ao criar usuário",
+          description: error.message || "Ocorreu um erro inesperado",
+          variant: "destructive",
+        });
       }
     } finally {
       if (!cooldown) {
@@ -287,30 +140,21 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
 
   return (
     <form onSubmit={criarPrimeiroAdmin} className="space-y-4">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Erro</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error && <FormError message={error} />}
       
       {cooldown && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Aguarde</AlertTitle>
-          <AlertDescription>
-            Você poderá tentar novamente em {cooldownTimer} segundos.
-          </AlertDescription>
-        </Alert>
+        <FormError 
+          title="Aguarde" 
+          message={`Você poderá tentar novamente em ${cooldownTimer} segundos.`}
+        />
       )}
       
       <div>
         <Label htmlFor="nome">Nome Completo</Label>
         <Input 
           id="nome"
-          value={nome} 
-          onChange={(e) => setNome(e.target.value)} 
+          value={formData.nome} 
+          onChange={(e) => updateField('nome', e.target.value)} 
           placeholder="Seu nome completo" 
           required 
           disabled={cooldown || carregando}
@@ -321,8 +165,8 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
         <Input 
           id="email"
           type="email" 
-          value={email} 
-          onChange={(e) => setEmail(e.target.value)} 
+          value={formData.email} 
+          onChange={(e) => updateField('email', e.target.value)} 
           placeholder="seu.email@exemplo.com" 
           required 
           disabled={cooldown || carregando}
@@ -333,8 +177,8 @@ const AdminCreateForm = ({ onSuccess }: AdminCreateFormProps) => {
         <Input 
           id="senha"
           type="password" 
-          value={senha} 
-          onChange={(e) => setSenha(e.target.value)} 
+          value={formData.senha} 
+          onChange={(e) => updateField('senha', e.target.value)} 
           placeholder="Senha de acesso" 
           required 
           minLength={6}
