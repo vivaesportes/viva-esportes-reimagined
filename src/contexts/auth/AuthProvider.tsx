@@ -32,7 +32,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const retryProfileFetch = async () => {
     if (user?.id) {
-      await fetchProfile(user.id);
+      console.log("Tentando buscar perfil novamente para o usuário:", user.id);
+      try {
+        const profileData = await fetchProfile(user.id);
+        console.log("Perfil obtido com sucesso:", profileData);
+        return profileData;
+      } catch (error) {
+        console.error("Erro ao buscar perfil:", error);
+        throw error;
+      }
+    } else {
+      console.error("Não é possível buscar o perfil: usuário não está autenticado");
+      throw new Error("Usuário não autenticado");
     }
   };
 

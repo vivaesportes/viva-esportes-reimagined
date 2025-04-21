@@ -21,6 +21,6 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   authError: string | null;
-  retryProfileFetch: () => Promise<void>;
+  retryProfileFetch: () => Promise<UserProfile>;
   resetAuthState: () => void;
 }

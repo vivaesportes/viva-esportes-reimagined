@@ -5,6 +5,8 @@ import { UserRole } from "@/contexts/auth/types";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/auth/AuthProvider";
 import { Button } from "@/components/ui/button";
+import { LoadingState } from "./LoadingState";
+import { supabase } from "@/lib/supabase";
 
 interface RotaProtegidaProps {
   children: React.ReactNode;
@@ -12,20 +14,39 @@ interface RotaProtegidaProps {
 }
 
 const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
-  const { isAuthenticated, loading, profile, isAdmin, resetAuthState } = useAuth();
+  const { isAuthenticated, loading, profile, isAdmin, resetAuthState, retryProfileFetch } = useAuth();
   const location = useLocation();
   const [showDebug, setShowDebug] = useState(false);
-  const [longWait, setLongWait] = useState(false);
+  const [loadingTimeout, setLoadingTimeout] = useState(false);
+  const [longLoadingTimeout, setLongLoadingTimeout] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const [resetAttempted, setResetAttempted] = useState(false);
+  const [databaseCheck, setDatabaseCheck] = useState<string | null>(null);
+  const [checkingDatabase, setCheckingDatabase] = useState(false);
 
-  // Set a timeout to show additional UI if loading takes too long
+  // Set timeouts for better UX during loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (loading) {
-        setLongWait(true);
-      }
-    }, 3000);
-
-    return () => clearTimeout(timer);
+    let timeoutId: NodeJS.Timeout | null = null;
+    let longTimeoutId: NodeJS.Timeout | null = null;
+    
+    if (loading) {
+      timeoutId = setTimeout(() => {
+        setLoadingTimeout(true);
+      }, 2000);
+      
+      longTimeoutId = setTimeout(() => {
+        setLongLoadingTimeout(true);
+        checkDatabaseConnection();
+      }, 5000);
+    } else {
+      setLoadingTimeout(false);
+      setLongLoadingTimeout(false);
+    }
+    
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+      if (longTimeoutId) clearTimeout(longTimeoutId);
+    };
   }, [loading]);
 
   // Debug info logging
@@ -34,47 +55,62 @@ const RotaProtegida = ({ children, nivelRequerido }: RotaProtegidaProps) => {
       isAuthenticated, 
       profileRole: profile?.role,
       isAdmin,
-      path: location.pathname
+      path: location.pathname,
+      loading
     });
-  }, [isAuthenticated, profile, isAdmin, location]);
+  }, [isAuthenticated, profile, isAdmin, location, loading]);
 
-  if (loading) {
+  // Function to check database connection
+  const checkDatabaseConnection = async () => {
+    try {
+      setCheckingDatabase(true);
+      const { data, error } = await supabase.from('profiles').select('count').limit(1);
+      
+      if (error) {
+        setDatabaseCheck(`Erro ao conectar com o banco: ${error.message}`);
+      } else {
+        setDatabaseCheck(`Conexão com banco de dados OK. Contagem: ${JSON.stringify(data)}`);
+      }
+    } catch (e: any) {
+      setDatabaseCheck(`Erro ao verificar banco: ${e.message}`);
+    } finally {
+      setCheckingDatabase(false);
+    }
+  };
+
+  // Handlers for loading state actions
+  const handleRetry = async () => {
+    setRetrying(true);
+    await retryProfileFetch();
+    setTimeout(() => setRetrying(false), 2000);
+  };
+
+  const handleReset = () => {
+    setResetAttempted(true);
+    resetAuthState();
+    // Reset will be handled by auth state changes
+  };
+
+  const handleForceLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.href = '/login';
+  };
+
+  // Check if we're in a loading state
+  if (loading || (isAuthenticated && !profile)) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <Loader2 className="h-12 w-12 text-viva-blue animate-spin mb-4" />
-        <h2 className="text-xl font-bold mb-2">Verificando autenticação...</h2>
-        
-        {longWait && (
-          <div className="mt-8 max-w-md">
-            <p className="text-orange-600 mb-4">
-              Está demorando mais que o esperado. Isso pode ocorrer devido a problemas de conexão.
-            </p>
-            <div className="flex gap-4">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowDebug(!showDebug)}
-              >
-                {showDebug ? "Ocultar detalhes" : "Mostrar detalhes"}
-              </Button>
-              <Button 
-                variant="destructive" 
-                onClick={resetAuthState}
-              >
-                Resetar autenticação
-              </Button>
-            </div>
-            
-            {showDebug && (
-              <div className="mt-4 p-4 bg-gray-100 rounded-md text-xs font-mono overflow-auto max-h-64">
-                <p>Caminho: {location.pathname}</p>
-                <p>Autenticado: {isAuthenticated ? "Sim" : "Não"}</p>
-                <p>Admin: {isAdmin ? "Sim" : "Não"}</p>
-                <p>Perfil: {profile ? JSON.stringify(profile, null, 2) : "Não carregado"}</p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <LoadingState
+        loadingTimeout={loadingTimeout}
+        longLoadingTimeout={longLoadingTimeout}
+        retrying={retrying}
+        resetAttempted={resetAttempted}
+        onRetry={handleRetry}
+        onReset={handleReset}
+        onForceLogout={handleForceLogout}
+        authError={null}
+        databaseCheck={databaseCheck}
+        checkingDatabase={checkingDatabase}
+      />
     );
   }
 
