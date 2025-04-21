@@ -7,7 +7,8 @@ const Locais = () => {
     {
       id: 1,
       name: "Colégio Novos Tempos",
-      address: "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
+      address:
+        "Av. Pref. Gil Diniz, 581 - Antigo nº 373 - Centro, Contagem - MG, 32013-650",
       modalidades: [
         "Futsal",
         "Vôlei",
@@ -16,23 +17,23 @@ const Locais = () => {
         "Ballet",
         "Jazz",
         "Taekwondo",
-        "Muay Thai"
+        "Muay Thai",
       ],
-      image: "/placeholder.svg"
+      image: "/lovable-uploads/8f89c5cb-1aed-44a6-a0b1-f898d19e3e51.png",
     },
     {
       id: 2,
       name: "Colégio Novos Tempos - Betim",
       address: "R. Do Acre, 536 - Sra. das Graças, Betim - MG, 32604-640",
       modalidades: ["Ballet", "Futsal", "Vôlei"],
-      image: "/placeholder.svg"
-    }
+      image: "/placeholder.svg",
+    },
   ];
 
   return (
     <section className="py-20 bg-white">
       <div className="container mx-auto px-4">
-        <motion.div 
+        <motion.div
           className="text-center mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -43,52 +44,56 @@ const Locais = () => {
             Onde <span className="text-viva-blue">Estamos</span>
           </h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Aulas em diversos locais da cidade para facilitar o acesso de todas as crianças e adolescentes.
+            Aulas em diversos locais da cidade para facilitar o acesso de todas
+            as crianças e adolescentes.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {locais.map((local, index) => (
-            <motion.div 
-              key={local.id}
-              className="bg-white rounded-lg overflow-hidden shadow-lg hover-scale"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <div className="h-48 overflow-hidden">
-                <img 
-                  src={local.image} 
-                  alt={local.name}
-                  className="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold mb-2">{local.name}</h3>
-                <div className="flex items-start mb-4">
-                  <MapPin size={18} className="text-viva-red mt-1 mr-2" />
-                  <p className="text-gray-600">{local.address}</p>
+        <div className="flex flex-col items-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 justify-center max-w-4xl w-full">
+            {locais.map((local, index) => (
+              <motion.div
+                key={local.id}
+                className="bg-white rounded-lg overflow-hidden shadow-lg flex flex-col hover-scale"
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <div className="h-52 w-full overflow-hidden flex items-center justify-center bg-viva-blue/5">
+                  <img
+                    src={local.image}
+                    alt={local.name}
+                    className="object-cover w-full h-full transition-transform duration-500"
+                    style={{ maxHeight: "208px" }}
+                  />
                 </div>
-                <div>
-                  <h4 className="font-semibold mb-2">Modalidades:</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {local.modalidades.map((modalidade) => (
-                      <span 
-                        key={modalidade} 
-                        className="bg-viva-blue/10 text-viva-blue px-3 py-1 rounded-full text-sm"
-                      >
-                        {modalidade}
-                      </span>
-                    ))}
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-xl font-bold mb-2 text-center">{local.name}</h3>
+                  <div className="flex items-start mb-4 justify-center">
+                    <MapPin size={18} className="text-viva-red mt-1 mr-2" />
+                    <p className="text-gray-600 text-center">{local.address}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-2 text-center">Modalidades:</h4>
+                    <div className="flex flex-wrap gap-2 justify-center">
+                      {local.modalidades.map((modalidade) => (
+                        <span
+                          key={modalidade}
+                          className="bg-viva-blue/10 text-viva-blue px-3 py-1 rounded-full text-sm"
+                        >
+                          {modalidade}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
-        
-        <motion.div 
+
+        <motion.div
           className="text-center mt-12"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -98,8 +103,8 @@ const Locais = () => {
           <p className="text-lg text-gray-600 mb-8">
             Todas as nossas unidades contam com infraestrutura adequada e profissionais qualificados
           </p>
-          <a 
-            href="/locais" 
+          <a
+            href="/locais"
             className="inline-block bg-viva-blue hover:bg-viva-darkBlue text-white font-bold py-3 px-8 rounded-full transition-colors"
           >
             Ver todos os locais
