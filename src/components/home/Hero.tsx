@@ -17,11 +17,11 @@ const Hero = () => {
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-20 left-10 w-40 h-40 rounded-full bg-viva-red opacity-20"></div>
         <div className="absolute bottom-20 right-10 w-64 h-64 rounded-full bg-viva-yellow opacity-20"></div>
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-white opacity-10 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden">
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full bg-white opacity-10 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden flex items-center justify-center">
           <img
-            src="/lovable-uploads/69396e5e-96fd-431e-9bb1-29b8a6da9069.png"
-            alt="Imagem meninas praticando esporte"
-            className="w-full h-full object-cover"
+            src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
+            alt="Logo Viva Esportes"
+            className="w-32 h-32 object-contain"
           />
         </div>
       </div>
@@ -50,11 +50,6 @@ const Hero = () => {
                 variant="outline"
                 className="border-white text-viva-red hover:bg-white/10 text-lg px-8 py-6 rounded-full flex items-center justify-center gap-2"
               >
-                <img
-                  src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
-                  alt="Logo Viva Esportes"
-                  className="w-6 h-6"
-                />
                 Conheça as Modalidades
               </Button>
             </div>
@@ -74,11 +69,11 @@ const Hero = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-5 -right-5 w-32 h-32 bg-viva-red rounded-full overflow-hidden border-4 border-white">
+              <div className="absolute -bottom-5 -right-5 w-32 h-32 bg-white rounded-full overflow-hidden border-4 border-white flex items-center justify-center">
                 <img
-                  src="/placeholder.svg"
-                  alt="Jovem atleta"
-                  className="w-full h-full object-cover"
+                  src="/lovable-uploads/4aad2750-d3a5-4e37-839b-5eef7c466b7c.png"
+                  alt="Logo Viva Esportes"
+                  className="w-24 h-24 object-contain"
                 />
               </div>
             </div>
