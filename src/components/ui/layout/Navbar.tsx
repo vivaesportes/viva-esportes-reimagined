@@ -40,28 +40,32 @@ const Navbar = () => {
   return (
     <nav className="bg-white fixed w-full top-0 left-0 z-50 shadow">
       <div className="container mx-auto flex justify-between items-center py-3 px-4">
+        {/* Ensure logo is ALWAYS visible */}
         <Link to="/" className="flex items-center gap-2">
-          <Logo className="h-8 w-8" />
-          <span className="font-bold text-viva-darkBlue">Viva Esportes</span>
+          <Logo className="h-8 w-8 min-w-[32px]" />
+          <span className="font-bold text-viva-darkBlue hidden sm:inline">Viva Esportes</span>
         </Link>
         
         {isMobile ? (
           <>
             <button 
               onClick={toggleMenu} 
-              className="text-viva-darkBlue hover:text-viva-blue p-2"
+              className="text-viva-darkBlue hover:text-viva-blue p-2 ml-auto"
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
             
-            {/* Mobile menu overlay */}
             {isMenuOpen && (
               <div className="fixed inset-0 bg-black bg-opacity-50 z-40" onClick={closeMenu}>
                 <div 
                   className="absolute right-0 top-0 h-screen w-64 bg-white shadow-lg py-4 px-6 z-50"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex justify-end mb-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <Link to="/" className="flex items-center gap-2">
+                      <Logo className="h-8 w-8" />
+                      <span className="font-bold text-viva-darkBlue">Viva Esportes</span>
+                    </Link>
                     <button onClick={closeMenu} className="text-viva-darkBlue">
                       <X size={24} />
                     </button>
@@ -99,7 +103,7 @@ const Navbar = () => {
             )}
           </>
         ) : (
-          <ul className="flex gap-6 items-center">
+          <ul className="flex gap-6 items-center ml-auto">
             {menuItems.map((item) => (
               <li key={item.path}>
                 <Link
