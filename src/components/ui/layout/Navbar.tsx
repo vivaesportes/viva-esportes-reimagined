@@ -2,13 +2,15 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "../Logo";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogIn } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -97,6 +99,16 @@ const Navbar = () => {
                         Fale Conosco
                       </Link>
                     </li>
+                    <li className="mt-2">
+                      <Link
+                        to={isAuthenticated ? "/painel" : "/login"}
+                        className="flex items-center justify-center w-full border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full text-center transition-colors"
+                        onClick={closeMenu}
+                      >
+                        <LogIn className="mr-2 h-4 w-4" />
+                        {isAuthenticated ? "Área do Professor" : "Login"}
+                      </Link>
+                    </li>
                   </ul>
                 </div>
               </div>
@@ -127,6 +139,17 @@ const Navbar = () => {
                 }`}
               >
                 Fale Conosco
+              </Link>
+            </li>
+            <li>
+              <Link
+                to={isAuthenticated ? "/painel" : "/login"}
+                className={`border border-viva-blue text-viva-blue hover:bg-viva-blue hover:text-white font-bold py-2 px-4 rounded-full flex items-center transition-colors ${
+                  location.pathname === "/login" || location.pathname === "/painel" ? "ring-2 ring-viva-red" : ""
+                }`}
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                {isAuthenticated ? "Área do Professor" : "Login"}
               </Link>
             </li>
           </ul>
