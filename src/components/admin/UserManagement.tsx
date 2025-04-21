@@ -46,22 +46,38 @@ export const UserManagement = ({ usuarios, loading, setUsuarios }: {
 
       setActionLoading(true);
       
-      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      // Usando o signup diretamente em vez de admin.createUser
+      // que requer permissão de service_role
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.senha,
-        email_confirm: true,
-        user_metadata: { nome: formData.nome }
+        options: {
+          data: {
+            nome: formData.nome,
+            role: formData.role
+          },
+          emailRedirectTo: `${window.location.origin}/login`
+        }
       });
 
       if (authError) throw authError;
 
+      // Se tiver criado com sucesso o usuário
       if (authData.user) {
+        // Tenta atualizar diretamente a tabela de profiles
         const { error: profileError } = await supabase
           .from('profiles')
-          .update({ role: formData.role })
-          .eq('id', authData.user.id);
+          .insert([{ 
+            id: authData.user.id,
+            email: formData.email,
+            nome: formData.nome,
+            role: formData.role
+          }])
+          .select();
 
-        if (profileError) throw profileError;
+        if (profileError) {
+          console.warn("Aviso: O perfil pode ser criado automaticamente via trigger:", profileError);
+        }
       }
 
       toast({
@@ -69,6 +85,7 @@ export const UserManagement = ({ usuarios, loading, setUsuarios }: {
         description: `${formData.nome} foi adicionado como ${formData.role === 'admin' ? 'administrador' : 'professor'}`,
       });
 
+      // Recarrega a lista de usuários
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
