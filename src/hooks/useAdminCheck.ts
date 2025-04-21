@@ -5,10 +5,14 @@ import { supabase } from '@/lib/supabase';
 export const useAdminCheck = () => {
   const [adminExiste, setAdminExiste] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const verificarAdmin = async () => {
       try {
+        setLoading(true);
+        setError(null);
+        
         const { data, error } = await supabase
           .from('profiles')
           .select('id')
@@ -17,6 +21,7 @@ export const useAdminCheck = () => {
         
         if (error) {
           console.error('Erro ao verificar admin:', error);
+          setError(error.message);
           return;
         }
         
@@ -24,10 +29,12 @@ export const useAdminCheck = () => {
           setAdminExiste(true);
           console.log("Admin já existe no sistema");
         } else {
+          setAdminExiste(false);
           console.log("Nenhum admin encontrado, formulário disponível");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao verificar admin:', error);
+        setError(error.message);
       } finally {
         setLoading(false);
       }
@@ -36,5 +43,5 @@ export const useAdminCheck = () => {
     verificarAdmin();
   }, []);
 
-  return { adminExiste, loading };
+  return { adminExiste, loading, error };
 };

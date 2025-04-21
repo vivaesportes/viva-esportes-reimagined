@@ -3,7 +3,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import Layout from '@/components/ui/layout/Layout';
 import Logo from '@/components/ui/Logo';
@@ -13,7 +13,7 @@ import { useAdminCheck } from '@/hooks/useAdminCheck';
 
 const PrimeiroAcesso = () => {
   const navigate = useNavigate();
-  const { adminExiste } = useAdminCheck();
+  const { adminExiste, loading, error } = useAdminCheck();
 
   return (
     <Layout>
@@ -39,7 +39,17 @@ const PrimeiroAcesso = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {adminExiste ? (
+              {loading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="h-8 w-8 animate-spin text-viva-blue" />
+                </div>
+              ) : error ? (
+                <Alert variant="destructive" className="mb-4">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Erro ao verificar admin</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              ) : adminExiste ? (
                 <>
                   <Alert variant="destructive" className="mb-4">
                     <AlertCircle className="h-4 w-4" />
