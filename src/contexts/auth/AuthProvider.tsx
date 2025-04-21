@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { AuthContextType } from './types';
 import { useAuthState } from './hooks/useAuthState';
 import { useAuthStateActions } from './hooks/useAuthStateActions';
@@ -57,6 +57,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   } = useProfile();
 
   const { signIn, signOut } = useAuthActions();
+
+  // Efeito para carregar perfil do usuário quando o estado de autenticação mudar
+  useEffect(() => {
+    if (user && !profile) {
+      console.log("👤 Usuário autenticado detectado, carregando perfil:", user.id);
+      fetchProfile(user.id).catch(err => {
+        console.error("❌ Erro ao carregar perfil automaticamente:", err);
+        setAuthError(`Erro ao carregar perfil: ${err.message}`);
+      });
+    }
+  }, [user, profile]);
 
   const retryProfileFetch = async () => {
     if (!user) {
