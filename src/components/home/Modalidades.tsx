@@ -5,7 +5,7 @@ import { IoMdFitness } from "react-icons/io";
 import { PiSoccerBallFill } from "react-icons/pi";
 import { IoMusicalNotes } from "react-icons/io5";
 import { Card, CardContent } from "@/components/ui/card";
-import { Dumbbell, Ball, Sword, Medal } from "lucide-react";
+import { Activity, Dumbbell, Sword } from "lucide-react";
 
 const Modalidades = () => {
   const modalidades = [
@@ -48,14 +48,14 @@ const Modalidades = () => {
       id: 6,
       name: "Basquete",
       description: "Trabalhe agilidade, coordenação motora e espírito de equipe",
-      icon: Ball,
+      icon: Activity,
       color: "bg-yellow-500",
     },
     {
       id: 7,
       name: "Futebol Society",
       description: "Pratique futebol em campo reduzido e desenvolva estratégias rápidas",
-      icon: Ball,
+      icon: Activity,
       color: "bg-green-600",
     },
     {
