@@ -1,3 +1,4 @@
+
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Layout from "@/components/ui/layout/Layout";
@@ -10,6 +11,7 @@ import Eventos from "@/components/home/Eventos";
 import Depoimentos from "@/components/home/Depoimentos";
 import Contato from "@/components/home/Contato";
 import { HolidaysCalendar } from "@/components/home/calendario/HolidaysCalendar";
+import Parceiros from "@/components/home/Parceiros";
 
 const Index = () => {
   const location = useLocation();
@@ -50,6 +52,7 @@ const Index = () => {
         <Galeria />
         <Eventos />
         <Depoimentos />
+        <Parceiros />
         <HolidaysCalendar />
         <Contato />
       </div>

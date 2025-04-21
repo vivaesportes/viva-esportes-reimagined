@@ -1,16 +1,18 @@
-
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import WhatsAppButton from "../WhatsAppButton";
-import Logo from "@/components/ui/Logo"; // Import the Logo component
+import Logo from "@/components/ui/Logo";
+
+interface LayoutProps {
+  children: React.ReactNode;
+}
 
 const Layout = ({ children }: LayoutProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading to show animation
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1000);
