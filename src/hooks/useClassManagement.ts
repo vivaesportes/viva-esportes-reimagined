@@ -20,9 +20,11 @@ interface UseClassManagementProps {
 export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) => {
   const [turmas, setTurmas] = useState<Turma[]>(initialTurmas);
   const [openTurmaDialog, setOpenTurmaDialog] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
 
   const handleDeleteTurma = async (id: string) => {
     try {
+      setActionLoading(true);
       const { error } = await supabase
         .from('turmas')
         .delete()
@@ -42,25 +44,108 @@ export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) =
         description: error.message || "Ocorreu um erro ao excluir a turma",
         variant: "destructive",
       });
+    } finally {
+      setActionLoading(false);
     }
   };
 
-  const handleEditTurma = (turma: Turma) => {
-    // TODO: Implementar edição de turma
-    console.log('Editar turma:', turma);
+  const handleEditTurma = async (turma: Turma) => {
+    try {
+      setActionLoading(true);
+      const { error } = await supabase
+        .from('turmas')
+        .update({
+          nome: turma.nome,
+          modalidade: turma.modalidade,
+          horario: turma.horario,
+          dia_semana: turma.dia_semana,
+          local: turma.local,
+          professor_id: turma.professor_id
+        })
+        .eq('id', turma.id);
+
+      if (error) throw error;
+
+      setTurmas(turmas.map(t => t.id === turma.id ? turma : t));
+      toast({
+        title: "Turma atualizada",
+        description: "A turma foi atualizada com sucesso",
+      });
+    } catch (error: any) {
+      console.error('Erro ao editar turma:', error);
+      toast({
+        title: "Erro ao editar turma",
+        description: error.message || "Ocorreu um erro ao editar a turma",
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(false);
+    }
   };
 
-  const handleAddTurma = (newTurma: Turma) => {
-    setTurmas([...turmas, newTurma]);
-    setOpenTurmaDialog(false);
+  const handleAddTurma = async (newTurma: Omit<Turma, 'id'>) => {
+    try {
+      setActionLoading(true);
+      const { data, error } = await supabase
+        .from('turmas')
+        .insert([newTurma])
+        .select();
+
+      if (error) throw error;
+
+      if (data && data.length > 0) {
+        setTurmas([...turmas, data[0]]);
+        setOpenTurmaDialog(false);
+        toast({
+          title: "Turma adicionada",
+          description: "A turma foi adicionada com sucesso",
+        });
+        return data[0];
+      }
+    } catch (error: any) {
+      console.error('Erro ao adicionar turma:', error);
+      toast({
+        title: "Erro ao adicionar turma",
+        description: error.message || "Ocorreu um erro ao adicionar a turma",
+        variant: "destructive",
+      });
+      return null;
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const reloadTurmas = async () => {
+    try {
+      setActionLoading(true);
+      const { data, error } = await supabase
+        .from('turmas')
+        .select('*')
+        .order('nome', { ascending: true });
+
+      if (error) throw error;
+
+      setTurmas(data || []);
+    } catch (error: any) {
+      console.error('Erro ao recarregar turmas:', error);
+      toast({
+        title: "Erro ao carregar turmas",
+        description: error.message || "Ocorreu um erro ao carregar as turmas",
+        variant: "destructive",
+      });
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   return {
     turmas,
     openTurmaDialog,
     setOpenTurmaDialog,
+    actionLoading,
     handleDeleteTurma,
     handleEditTurma,
     handleAddTurma,
+    reloadTurmas
   };
 };

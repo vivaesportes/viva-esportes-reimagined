@@ -78,7 +78,7 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
   };
 
   return (
-    <DialogContent>
+    <DialogContent className="sm:max-w-[500px]">
       <DialogHeader>
         <DialogTitle>Adicionar Nova Turma</DialogTitle>
         <DialogDescription>

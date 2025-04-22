@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -40,13 +40,20 @@ export const ClassManagement = ({
     turmas,
     openTurmaDialog,
     setOpenTurmaDialog,
+    actionLoading,
     handleDeleteTurma,
     handleEditTurma,
-    handleAddTurma
+    handleAddTurma,
+    reloadTurmas
   } = useClassManagement({ initialTurmas });
 
-  // Mantem o estado global sincronizado
-  React.useEffect(() => {
+  // Carrega as turmas ao montar o componente
+  useEffect(() => {
+    reloadTurmas();
+  }, []);
+
+  // Mantém o estado global sincronizado
+  useEffect(() => {
     setTurmasGlobal(turmas);
   }, [turmas, setTurmasGlobal]);
 
@@ -74,7 +81,7 @@ export const ClassManagement = ({
         </Dialog>
       </CardHeader>
       <CardContent>
-        {turmasLoading ? (
+        {turmasLoading || actionLoading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-8 w-8 animate-spin text-viva-blue" />
           </div>

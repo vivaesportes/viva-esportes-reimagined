@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/contexts/auth/AuthContext';
 import { supabase } from '@/lib/supabase';
 import PainelLayout from '@/components/auth/PainelLayout';
@@ -32,62 +33,105 @@ const PainelAdmin = () => {
   const [loading, setLoading] = useState(true);
   const [turmasLoading, setTurmasLoading] = useState(true);
 
+  const carregarUsuarios = useCallback(async () => {
+    try {
+      if (!profile?.id) return;
+
+      setLoading(true);
+      console.log("PainelAdmin - Carregando usuários...");
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      console.log("PainelAdmin - Usuários carregados:", data);
+      setUsuarios(data || []);
+    } catch (error: any) {
+      console.error('Erro ao carregar usuários:', error);
+      toast({
+        title: "Erro ao carregar usuários",
+        description: error.message || "Não foi possível carregar a lista de usuários",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  }, [profile?.id]);
+
+  const carregarTurmas = useCallback(async () => {
+    try {
+      setTurmasLoading(true);
+      console.log("PainelAdmin - Carregando turmas...");
+      
+      const { data, error } = await supabase
+        .from('turmas')
+        .select('*')
+        .order('nome', { ascending: true });
+
+      if (error) throw error;
+      console.log("PainelAdmin - Turmas carregadas:", data);
+      setTurmas(data || []);
+    } catch (error: any) {
+      console.error('Erro ao carregar turmas:', error);
+      toast({
+        title: "Erro ao carregar turmas",
+        description: error.message || "Não foi possível carregar a lista de turmas",
+        variant: "destructive",
+      });
+    } finally {
+      setTurmasLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     console.log("PainelAdmin - Componente montado");
     console.log("PainelAdmin - Perfil do usuário:", profile);
     
-    const carregarUsuarios = async () => {
-      try {
-        if (!profile?.id) return;
+    if (profile?.id) {
+      carregarUsuarios();
+      carregarTurmas();
+    }
+  }, [profile?.id, carregarUsuarios, carregarTurmas]);
 
-        setLoading(true);
-        console.log("PainelAdmin - Carregando usuários...");
-        
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .order('created_at', { ascending: false });
+  // Configurar listener para atualizações de turmas
+  useEffect(() => {
+    const turmasSubscription = supabase
+      .channel('turmas-changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'turmas' 
+      }, () => {
+        console.log('Mudanças detectadas na tabela turmas, recarregando...');
+        carregarTurmas();
+      })
+      .subscribe();
 
-        if (error) throw error;
-        console.log("PainelAdmin - Usuários carregados:", data);
-        setUsuarios(data || []);
-      } catch (error) {
-        console.error('Erro ao carregar usuários:', error);
-        toast({
-          title: "Erro ao carregar usuários",
-          description: "Não foi possível carregar a lista de usuários",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
+    return () => {
+      supabase.removeChannel(turmasSubscription);
     };
+  }, [carregarTurmas]);
 
-    const carregarTurmas = async () => {
-      try {
-        setTurmasLoading(true);
-        const { data, error } = await supabase
-          .from('turmas')
-          .select('*')
-          .order('nome', { ascending: true });
+  // Configurar listener para atualizações de usuários
+  useEffect(() => {
+    const usuariosSubscription = supabase
+      .channel('profiles-changes')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'profiles' 
+      }, () => {
+        console.log('Mudanças detectadas na tabela profiles, recarregando...');
+        carregarUsuarios();
+      })
+      .subscribe();
 
-        if (error) throw error;
-        setTurmas(data || []);
-      } catch (error) {
-        console.error('Erro ao carregar turmas:', error);
-        toast({
-          title: "Erro ao carregar turmas",
-          description: "Não foi possível carregar a lista de turmas",
-          variant: "destructive",
-        });
-      } finally {
-        setTurmasLoading(false);
-      }
+    return () => {
+      supabase.removeChannel(usuariosSubscription);
     };
-
-    carregarUsuarios();
-    carregarTurmas();
-  }, [profile?.id]);
+  }, [carregarUsuarios]);
 
   if (!profile) {
     return (

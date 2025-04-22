@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog } from "@/components/ui/dialog";
 import { UserTable } from './users/UserTable';
@@ -33,11 +33,17 @@ export const UserManagement = ({
     actionLoading,
     handleCriarUsuario,
     handleExcluirUsuario,
-    handleResetarSenha
+    handleResetarSenha,
+    reloadUsers
   } = useUserManagement(initialUsuarios);
 
-  // Sync state with parent component
-  React.useEffect(() => {
+  // Recarregar usuários quando o componente for montado
+  useEffect(() => {
+    reloadUsers();
+  }, []);
+
+  // Sincronizar estado com o componente pai
+  useEffect(() => {
     setParentUsuarios(usuarios);
   }, [usuarios, setParentUsuarios]);
 
@@ -55,7 +61,7 @@ export const UserManagement = ({
       <CardContent>
         <UserTable 
           usuarios={usuarios}
-          loading={loading}
+          loading={loading || actionLoading}
           onResetPassword={(email, id) => {
             setResetSenha({ email, id });
             setOpenResetDialog(true);

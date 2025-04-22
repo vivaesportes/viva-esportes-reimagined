@@ -28,7 +28,7 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
           description: "Preencha todos os campos obrigatórios",
           variant: "destructive",
         });
-        return;
+        return false;
       }
 
       setActionLoading(true);
@@ -87,22 +87,26 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
     try {
       setActionLoading(true);
       
-      const { error: authError } = await supabase.auth.admin.deleteUser(
-        userId,
-        true
-      );
-      
-      if (authError) {
-        console.error('Erro ao excluir usuário do auth system:', authError);
+      // Primeiro, exclua o perfil do usuário da tabela profiles
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
         
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .delete()
-          .eq('id', userId);
-          
-        if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Erro ao excluir perfil do usuário:', profileError);
+        throw profileError;
       }
       
+      // Em seguida, exclua o usuário da autenticação do Supabase
+      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+      
+      if (authError) {
+        console.error('Erro ao excluir usuário da autenticação:', authError);
+        throw authError;
+      }
+      
+      // Atualiza o estado local removendo o usuário excluído
       setUsuarios(usuarios.filter(user => user.id !== userId));
 
       toast({
@@ -110,7 +114,6 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
         description: "O usuário foi removido com sucesso",
       });
       
-      await reloadUsers();
     } catch (error: any) {
       console.error('Erro ao excluir usuário:', error);
       toast({
@@ -131,7 +134,7 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
           description: "Informe o e-mail do usuário",
           variant: "destructive",
         });
-        return;
+        return false;
       }
 
       setActionLoading(true);
@@ -162,17 +165,21 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
   };
 
   const reloadUsers = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('created_at', { ascending: false });
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error('Erro ao recarregar lista de usuários:', error);
-      return;
+      if (error) {
+        console.error('Erro ao recarregar lista de usuários:', error);
+        throw error;
+      }
+
+      setUsuarios(data || []);
+    } catch (error) {
+      console.error('Erro ao recarregar usuários:', error);
     }
-
-    setUsuarios(data || []);
   };
 
   return {
@@ -181,6 +188,7 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
     actionLoading,
     handleCriarUsuario,
     handleExcluirUsuario,
-    handleResetarSenha
+    handleResetarSenha,
+    reloadUsers
   };
 };
