@@ -15,9 +15,15 @@ interface UserTableRowProps {
   usuario: Usuario;
   onResetPassword: (email: string, id: string) => void;
   onDeleteUser: (userId: string) => void;
+  isDeleting?: boolean;
 }
 
-export const UserTableRow = ({ usuario, onResetPassword, onDeleteUser }: UserTableRowProps) => {
+export const UserTableRow = ({ 
+  usuario, 
+  onResetPassword, 
+  onDeleteUser, 
+  isDeleting = false 
+}: UserTableRowProps) => {
   return (
     <TableRow>
       <TableCell>{usuario.nome}</TableCell>
@@ -39,6 +45,7 @@ export const UserTableRow = ({ usuario, onResetPassword, onDeleteUser }: UserTab
           usuario={usuario}
           onResetPassword={onResetPassword}
           onDeleteUser={onDeleteUser}
+          isDeleting={isDeleting}
         />
       </TableCell>
     </TableRow>

@@ -87,27 +87,27 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
     try {
       setActionLoading(true);
       
-      // Primeiro, exclua o perfil do usuário da tabela profiles
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
-        
-      if (profileError) {
-        console.error('Erro ao excluir perfil do usuário:', profileError);
-        throw profileError;
+      // First, find the user to delete in our local state
+      const userToDelete = usuarios.find(user => user.id === userId);
+      if (!userToDelete) {
+        throw new Error("Usuário não encontrado");
       }
       
-      // Em seguida, exclua o usuário da autenticação do Supabase
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+      console.log(`Deletando usuário: ${userToDelete.nome} (${userToDelete.email})`);
       
-      if (authError) {
-        console.error('Erro ao excluir usuário da autenticação:', authError);
-        throw authError;
+      // Use the server-side function to delete the user
+      // This will handle both profile and auth deletion on the server
+      const { error } = await supabase.rpc('delete_user', {
+        user_id: userId
+      });
+      
+      if (error) {
+        console.error('Erro na função RPC delete_user:', error);
+        throw error;
       }
       
-      // Atualiza o estado local removendo o usuário excluído
-      setUsuarios(usuarios.filter(user => user.id !== userId));
+      // Update the local state by removing the deleted user
+      setUsuarios(prevUsuarios => prevUsuarios.filter(user => user.id !== userId));
 
       toast({
         title: "Usuário excluído",

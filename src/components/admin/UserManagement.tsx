@@ -27,6 +27,7 @@ export const UserManagement = ({
   const [openDialog, setOpenDialog] = useState(false);
   const [openResetDialog, setOpenResetDialog] = useState(false);
   const [resetSenha, setResetSenha] = useState({ email: '', id: '' });
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null);
 
   const {
     usuarios,
@@ -37,15 +38,24 @@ export const UserManagement = ({
     reloadUsers
   } = useUserManagement(initialUsuarios);
 
-  // Recarregar usuários quando o componente for montado
+  // Reload users when the component is mounted
   useEffect(() => {
     reloadUsers();
   }, []);
 
-  // Sincronizar estado com o componente pai
+  // Synchronize state with parent component
   useEffect(() => {
     setParentUsuarios(usuarios);
   }, [usuarios, setParentUsuarios]);
+
+  const handleDeleteUser = async (userId: string) => {
+    setDeleteLoading(userId);
+    try {
+      await handleExcluirUsuario(userId);
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
 
   return (
     <Card>
@@ -66,7 +76,8 @@ export const UserManagement = ({
             setResetSenha({ email, id });
             setOpenResetDialog(true);
           }}
-          onDeleteUser={handleExcluirUsuario}
+          onDeleteUser={handleDeleteUser}
+          deleteLoading={deleteLoading}
         />
       </CardContent>
 

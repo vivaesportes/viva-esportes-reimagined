@@ -18,13 +18,15 @@ interface UserTableProps {
   loading: boolean;
   onResetPassword: (email: string, id: string) => void;
   onDeleteUser: (userId: string) => void;
+  deleteLoading?: string | null;
 }
 
 export const UserTable = ({ 
   usuarios, 
   loading, 
   onResetPassword,
-  onDeleteUser 
+  onDeleteUser,
+  deleteLoading
 }: UserTableProps) => {
   if (loading) {
     return <LoadingState />;
@@ -45,6 +47,7 @@ export const UserTable = ({
               usuario={usuario}
               onResetPassword={onResetPassword}
               onDeleteUser={onDeleteUser}
+              isDeleting={deleteLoading === usuario.id}
             />
           ))}
         </TableBody>

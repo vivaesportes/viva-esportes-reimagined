@@ -12,43 +12,62 @@ export const useDatabaseVerification = () => {
       try {
         setIsVerifying(true);
         
-        // Verifica se a tabela 'turmas' existe
+        // Step 1: Verify if the delete_user function exists
+        const { data: funcExists, error: funcError } = await supabase.rpc('function_exists', {
+          function_name: 'delete_user'
+        });
+        
+        if (funcError) {
+          console.log('Error checking function existence:', funcError);
+          // Continue with table checks
+        }
+        
+        if (!funcExists) {
+          console.log('Creating delete_user function...');
+          const { error: createFuncError } = await supabase.rpc('create_delete_user_function');
+          
+          if (createFuncError) {
+            console.error('Error creating delete_user function:', createFuncError);
+          }
+        }
+        
+        // Step 2: Verify if the turmas table exists
         const { data: tableExists, error: tableError } = await supabase
           .from('turmas')
           .select('id')
           .limit(1);
           
         if (tableError) {
-          // Se der erro, provavelmente a tabela não existe, então tenta criar
-          if (tableError.code === '42P01') { // código para tabela não existente
-            console.log('Tabela turmas não encontrada, criando...');
+          // If there's an error, the table might not exist, so try to create it
+          if (tableError.code === '42P01') { // code for non-existent table
+            console.log('Table turmas not found, creating...');
             
-            // Cria a tabela 'turmas'
+            // Create the turmas table
             const { error: createError } = await supabase.rpc('create_turmas_table');
             
             if (createError) {
-              console.error('Erro ao criar tabela turmas:', createError);
+              console.error('Error creating turmas table:', createError);
               toast({
-                title: "Erro de inicialização",
-                description: "Não foi possível configurar o banco de dados. Entre em contato com o suporte.",
+                title: "Database initialization error",
+                description: "Could not set up the database. Please contact support.",
                 variant: "destructive",
               });
               return;
             }
             
             toast({
-              title: "Banco de dados inicializado",
-              description: "O sistema foi configurado com sucesso.",
+              title: "Database initialized",
+              description: "The system has been successfully configured.",
             });
           } else {
-            // Se for outro erro, apenas informa
-            console.error('Erro ao verificar tabela turmas:', tableError);
+            // If it's another error, just report it
+            console.error('Error checking turmas table:', tableError);
           }
         }
         
         setIsVerified(true);
       } catch (error) {
-        console.error('Erro ao verificar banco de dados:', error);
+        console.error('Error verifying database:', error);
       } finally {
         setIsVerifying(false);
       }

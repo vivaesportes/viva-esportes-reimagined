@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Key, UserX } from 'lucide-react';
+import { Key, UserX, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
@@ -16,25 +16,52 @@ interface UserActionsProps {
   usuario: Usuario;
   onResetPassword: (email: string, id: string) => void;
   onDeleteUser: (userId: string) => void;
+  isDeleting?: boolean;
 }
 
-export const UserActions = ({ usuario, onResetPassword, onDeleteUser }: UserActionsProps) => {
+export const UserActions = ({ 
+  usuario, 
+  onResetPassword, 
+  onDeleteUser, 
+  isDeleting = false 
+}: UserActionsProps) => {
+  const [open, setOpen] = React.useState(false);
+
+  const handleDelete = () => {
+    onDeleteUser(usuario.id);
+    setOpen(false);
+  };
+
   return (
     <div className="flex gap-2">
       <Button 
         variant="outline" 
         size="sm"
         onClick={() => onResetPassword(usuario.email, usuario.id)}
+        disabled={isDeleting}
       >
         <Key className="h-4 w-4 mr-1" />
         <span className="hidden sm:inline">Resetar senha</span>
       </Button>
       
-      <AlertDialog>
+      <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive" size="sm">
-            <UserX className="h-4 w-4 mr-1" />
-            <span className="hidden sm:inline">Excluir</span>
+          <Button 
+            variant="destructive" 
+            size="sm" 
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                <span className="hidden sm:inline">Excluindo...</span>
+              </>
+            ) : (
+              <>
+                <UserX className="h-4 w-4 mr-1" />
+                <span className="hidden sm:inline">Excluir</span>
+              </>
+            )}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -47,7 +74,7 @@ export const UserActions = ({ usuario, onResetPassword, onDeleteUser }: UserActi
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction 
-              onClick={() => onDeleteUser(usuario.id)}
+              onClick={handleDelete}
               className="bg-red-600 hover:bg-red-700"
             >
               Excluir
