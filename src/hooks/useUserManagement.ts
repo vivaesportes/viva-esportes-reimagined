@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
@@ -87,24 +86,12 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
     try {
       setActionLoading(true);
       
-      // First, find the user to delete in our local state
-      const userToDelete = usuarios.find(user => user.id === userId);
-      if (!userToDelete) {
-        throw new Error("Usuário não encontrado");
-      }
-      
-      console.log(`Deletando usuário: ${userToDelete.nome} (${userToDelete.email})`);
-      
-      // Use the server-side function to delete the user
-      // This will handle both profile and auth deletion on the server
+      // Call the server-side function to delete the user
       const { error } = await supabase.rpc('delete_user', {
         user_id: userId
       });
       
-      if (error) {
-        console.error('Erro na função RPC delete_user:', error);
-        throw error;
-      }
+      if (error) throw error;
       
       // Update the local state by removing the deleted user
       setUsuarios(prevUsuarios => prevUsuarios.filter(user => user.id !== userId));

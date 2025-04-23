@@ -33,12 +33,63 @@ export type Database = {
         }
         Relationships: []
       }
+      turmas: {
+        Row: {
+          created_at: string
+          dia_semana: string
+          horario: string
+          id: string
+          local: string
+          modalidade: string
+          nome: string
+          professor_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          dia_semana: string
+          horario: string
+          id?: string
+          local: string
+          modalidade: string
+          nome: string
+          professor_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          dia_semana?: string
+          horario?: string
+          id?: string
+          local?: string
+          modalidade?: string
+          nome?: string
+          professor_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "turmas_professor_id_fkey"
+            columns: ["professor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      delete_user: {
+        Args: { user_id: string }
+        Returns: undefined
+      }
+      function_exists: {
+        Args: { function_name: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
