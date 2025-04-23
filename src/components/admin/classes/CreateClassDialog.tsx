@@ -34,6 +34,8 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
     { id: "quarta", label: "Quarta", checked: false },
     { id: "quinta", label: "Quinta", checked: false },
     { id: "sexta", label: "Sexta", checked: false },
+    { id: "sabado", label: "Sábado", checked: false },
+    { id: "domingo", label: "Domingo", checked: false },
   ]);
 
   const [loading, setLoading] = useState(false);
@@ -72,6 +74,7 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
 
       setLoading(true);
       
+      // Create the new class without specifying an ID (let the database generate it)
       const { data, error } = await supabase
         .from('turmas')
         .insert([{
@@ -123,10 +126,10 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
         usuarios={usuarios}
       />
 
-      <DialogFooter>
+      <DialogFooter className="gap-2">
         <Button variant="outline" onClick={onCancel}>Cancelar</Button>
-        <Button onClick={handleCreate} disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Plus className="h-4 w-4 mr-2" />}
+        <Button onClick={handleCreate} disabled={loading} className="gap-2">
+          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
           Criar Turma
         </Button>
       </DialogFooter>

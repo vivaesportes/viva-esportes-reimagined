@@ -57,6 +57,12 @@ export const ClassManagement = ({
     setTurmasGlobal(turmas);
   }, [turmas, setTurmasGlobal]);
 
+  // Find professor by ID function to get the name
+  const findProfessorById = (professorId: string | null) => {
+    if (!professorId) return null;
+    return usuarios.find(u => u.id === professorId);
+  };
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -92,7 +98,8 @@ export const ClassManagement = ({
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {turmas.map((turma) => {
-              const professor = usuarios.find(u => u.id === turma.professor_id);
+              // Find the professor object to pass to ClassCard
+              const professor = findProfessorById(turma.professor_id);
               return (
                 <ClassCard
                   key={turma.id}

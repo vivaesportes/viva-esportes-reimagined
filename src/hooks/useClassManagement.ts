@@ -32,7 +32,7 @@ export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) =
 
       if (error) throw error;
 
-      setTurmas(turmas.filter(t => t.id !== id));
+      setTurmas(prev => prev.filter(t => t.id !== id));
       toast({
         title: "Turma excluída",
         description: "A turma foi excluída com sucesso",
@@ -66,7 +66,7 @@ export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) =
 
       if (error) throw error;
 
-      setTurmas(turmas.map(t => t.id === turma.id ? turma : t));
+      setTurmas(prev => prev.map(t => t.id === turma.id ? turma : t));
       toast({
         title: "Turma atualizada",
         description: "A turma foi atualizada com sucesso",
@@ -84,38 +84,11 @@ export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) =
   };
 
   const handleAddTurma = async (newTurma: any) => {
-    try {
-      setActionLoading(true);
-      // Remove any ID from the turma object to let the database generate a new one
-      const { id, ...turmaWithoutId } = newTurma;
-      
-      const { data, error } = await supabase
-        .from('turmas')
-        .insert([turmaWithoutId])
-        .select();
-
-      if (error) throw error;
-
-      if (data && data.length > 0) {
-        setTurmas([...turmas, data[0]]);
-        setOpenTurmaDialog(false);
-        toast({
-          title: "Turma adicionada",
-          description: "A turma foi adicionada com sucesso",
-        });
-        return data[0];
-      }
-    } catch (error: any) {
-      console.error('Erro ao adicionar turma:', error);
-      toast({
-        title: "Erro ao adicionar turma",
-        description: error.message || "Ocorreu um erro ao adicionar a turma",
-        variant: "destructive",
-      });
-      return null;
-    } finally {
-      setActionLoading(false);
-    }
+    // Add the new turma to the state
+    setTurmas(prev => [...prev, newTurma]);
+    setOpenTurmaDialog(false);
+    
+    return newTurma;
   };
 
   const reloadTurmas = async () => {
