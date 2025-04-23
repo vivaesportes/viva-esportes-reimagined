@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
 import { DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
-import { Checkbox } from "@/components/ui/checkbox";
+import { CreateClassFormFields } from './CreateClassFormFields';
+import type { DiasSemana } from './DiasSemanaSelector';
 
 interface CreateClassDialogProps {
   usuarios: {
@@ -18,12 +16,6 @@ interface CreateClassDialogProps {
   }[];
   onSuccess: (newTurma: any) => void;
   onCancel: () => void;
-}
-
-interface DiasSemana {
-  id: string;
-  label: string;
-  checked: boolean;
 }
 
 export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClassDialogProps) => {
@@ -52,6 +44,10 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
         dia.id === id ? { ...dia, checked } : dia
       )
     );
+  };
+
+  const handleTurmaChange = (field: string, value: string) => {
+    setNovaTurma(prev => ({ ...prev, [field]: value }));
   };
 
   const getDiasSelecionados = () => {
@@ -118,83 +114,15 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
           Preencha os dados para criar uma nova turma.
         </DialogDescription>
       </DialogHeader>
-      <div className="grid gap-4 py-4">
-        <div className="grid gap-2">
-          <Label htmlFor="nome-turma">Nome da Turma</Label>
-          <Input
-            id="nome-turma"
-            value={novaTurma.nome}
-            onChange={(e) => setNovaTurma({...novaTurma, nome: e.target.value})}
-            placeholder="Ex: Ballet Infantil"
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="modalidade">Modalidade</Label>
-          <Input
-            id="modalidade"
-            value={novaTurma.modalidade}
-            onChange={(e) => setNovaTurma({...novaTurma, modalidade: e.target.value})}
-            placeholder="Ex: Ballet, Judô, Futebol"
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label>Dias da Semana</Label>
-          <div className="flex flex-col gap-2">
-            {diasSemana.map((dia) => (
-              <div key={dia.id} className="flex items-center space-x-2">
-                <Checkbox 
-                  id={dia.id}
-                  checked={dia.checked}
-                  onCheckedChange={(checked) => handleDiasSemanaChange(dia.id, checked as boolean)}
-                />
-                <Label htmlFor={dia.id} className="text-sm font-normal">
-                  {dia.label}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="horario">Horário</Label>
-          <Input
-            id="horario"
-            value={novaTurma.horario}
-            onChange={(e) => setNovaTurma({...novaTurma, horario: e.target.value})}
-            placeholder="Ex: 14:00 - 15:30"
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="local">Local</Label>
-          <Input
-            id="local"
-            value={novaTurma.local}
-            onChange={(e) => setNovaTurma({...novaTurma, local: e.target.value})}
-            placeholder="Ex: Sala 3, Quadra A"
-          />
-        </div>
-        <div className="grid gap-2">
-          <Label htmlFor="professor">Professor (opcional)</Label>
-          <Select
-            value={novaTurma.professor_id}
-            onValueChange={(value) => setNovaTurma({...novaTurma, professor_id: value})}
-          >
-            <SelectTrigger id="professor">
-              <SelectValue placeholder="Selecione um professor" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="sem_professor">-- Sem professor --</SelectItem>
-              {usuarios
-                .filter(u => u.role === 'professor')
-                .map(professor => (
-                  <SelectItem key={professor.id} value={professor.id}>
-                    {professor.nome}
-                  </SelectItem>
-                ))
-              }
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+      
+      <CreateClassFormFields
+        novaTurma={novaTurma}
+        onTurmaChange={handleTurmaChange}
+        diasSemana={diasSemana}
+        onDiaChange={handleDiasSemanaChange}
+        usuarios={usuarios}
+      />
+
       <DialogFooter>
         <Button variant="outline" onClick={onCancel}>Cancelar</Button>
         <Button onClick={handleCreate} disabled={loading}>
