@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Loader2, Plus } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabase';
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface CreateClassDialogProps {
   usuarios: {
@@ -19,6 +20,12 @@ interface CreateClassDialogProps {
   onCancel: () => void;
 }
 
+interface DiasSemana {
+  id: string;
+  label: string;
+  checked: boolean;
+}
+
 export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClassDialogProps) => {
   const [novaTurma, setNovaTurma] = useState({
     nome: '',
@@ -28,11 +35,37 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
     local: '',
     professor_id: ''
   });
+
+  const [diasSemana, setDiasSemana] = useState<DiasSemana[]>([
+    { id: "segunda", label: "Segunda", checked: false },
+    { id: "terca", label: "Terça", checked: false },
+    { id: "quarta", label: "Quarta", checked: false },
+    { id: "quinta", label: "Quinta", checked: false },
+    { id: "sexta", label: "Sexta", checked: false },
+  ]);
+
   const [loading, setLoading] = useState(false);
+
+  const handleDiasSemanaChange = (id: string, checked: boolean) => {
+    setDiasSemana(dias => 
+      dias.map(dia => 
+        dia.id === id ? { ...dia, checked } : dia
+      )
+    );
+  };
+
+  const getDiasSelecionados = () => {
+    return diasSemana
+      .filter(dia => dia.checked)
+      .map(dia => dia.label)
+      .join(", ");
+  };
 
   const handleCreate = async () => {
     try {
-      if (!novaTurma.nome || !novaTurma.modalidade || !novaTurma.horario || !novaTurma.dia_semana || !novaTurma.local) {
+      const diasSelecionados = getDiasSelecionados();
+      
+      if (!novaTurma.nome || !novaTurma.modalidade || !novaTurma.horario || !diasSelecionados || !novaTurma.local) {
         toast({
           title: "Dados incompletos",
           description: "Preencha todos os campos obrigatórios da turma",
@@ -49,9 +82,9 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
           nome: novaTurma.nome,
           modalidade: novaTurma.modalidade,
           horario: novaTurma.horario,
-          dia_semana: novaTurma.dia_semana,
+          dia_semana: diasSelecionados,
           local: novaTurma.local,
-          professor_id: novaTurma.professor_id || null
+          professor_id: novaTurma.professor_id === "sem_professor" ? null : novaTurma.professor_id
         }])
         .select();
 
@@ -104,35 +137,31 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
             placeholder="Ex: Ballet, Judô, Futebol"
           />
         </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="dia-semana">Dia da Semana</Label>
-            <Select
-              value={novaTurma.dia_semana}
-              onValueChange={(value) => setNovaTurma({...novaTurma, dia_semana: value})}
-            >
-              <SelectTrigger id="dia-semana">
-                <SelectValue placeholder="Selecione" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Segunda">Segunda</SelectItem>
-                <SelectItem value="Terça">Terça</SelectItem>
-                <SelectItem value="Quarta">Quarta</SelectItem>
-                <SelectItem value="Quinta">Quinta</SelectItem>
-                <SelectItem value="Sexta">Sexta</SelectItem>
-                <SelectItem value="Sábado">Sábado</SelectItem>
-              </SelectContent>
-            </Select>
+        <div className="grid gap-2">
+          <Label>Dias da Semana</Label>
+          <div className="flex flex-col gap-2">
+            {diasSemana.map((dia) => (
+              <div key={dia.id} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={dia.id}
+                  checked={dia.checked}
+                  onCheckedChange={(checked) => handleDiasSemanaChange(dia.id, checked as boolean)}
+                />
+                <Label htmlFor={dia.id} className="text-sm font-normal">
+                  {dia.label}
+                </Label>
+              </div>
+            ))}
           </div>
-          <div className="grid gap-2">
-            <Label htmlFor="horario">Horário</Label>
-            <Input
-              id="horario"
-              value={novaTurma.horario}
-              onChange={(e) => setNovaTurma({...novaTurma, horario: e.target.value})}
-              placeholder="Ex: 14:00 - 15:30"
-            />
-          </div>
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="horario">Horário</Label>
+          <Input
+            id="horario"
+            value={novaTurma.horario}
+            onChange={(e) => setNovaTurma({...novaTurma, horario: e.target.value})}
+            placeholder="Ex: 14:00 - 15:30"
+          />
         </div>
         <div className="grid gap-2">
           <Label htmlFor="local">Local</Label>
