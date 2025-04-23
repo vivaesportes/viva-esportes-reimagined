@@ -83,12 +83,15 @@ export const useClassManagement = ({ initialTurmas }: UseClassManagementProps) =
     }
   };
 
-  const handleAddTurma = async (newTurma: Omit<Turma, 'id'>) => {
+  const handleAddTurma = async (newTurma: any) => {
     try {
       setActionLoading(true);
+      // Remove any ID from the turma object to let the database generate a new one
+      const { id, ...turmaWithoutId } = newTurma;
+      
       const { data, error } = await supabase
         .from('turmas')
-        .insert([newTurma])
+        .insert([turmaWithoutId])
         .select();
 
       if (error) throw error;
