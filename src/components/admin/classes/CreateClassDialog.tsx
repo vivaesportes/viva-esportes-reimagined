@@ -153,7 +153,7 @@ export const CreateClassDialog = ({ usuarios, onSuccess, onCancel }: CreateClass
               <SelectValue placeholder="Selecione um professor" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">-- Sem professor --</SelectItem>
+              <SelectItem value="sem_professor">-- Sem professor --</SelectItem>
               {usuarios
                 .filter(u => u.role === 'professor')
                 .map(professor => (
