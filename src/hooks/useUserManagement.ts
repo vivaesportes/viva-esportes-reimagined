@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
@@ -32,15 +33,14 @@ export const useUserManagement = (initialUsers: Usuario[]) => {
 
       setActionLoading(true);
       
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      // Primeira etapa: Criar o usuário diretamente no Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
         email: formData.email,
         password: formData.senha,
-        options: {
-          data: {
-            nome: formData.nome,
-            role: formData.role
-          },
-          emailRedirectTo: `${window.location.origin}/login`
+        email_confirm: true, // Isso confirma o email automaticamente
+        user_metadata: {
+          nome: formData.nome,
+          role: formData.role
         }
       });
 
