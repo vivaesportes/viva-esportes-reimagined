@@ -49,14 +49,16 @@ export const useGalleryManagement = () => {
       
       if (!imageUrl) throw new Error('Falha ao fazer upload da imagem');
 
+      const newItem = {
+        title: data.title,
+        description: data.description,
+        image_url: imageUrl,
+        order_index: items.length, // Add new items at the end
+      };
+
       const { error } = await supabase
         .from('gallery_collections')
-        .insert({
-          title: data.title,
-          description: data.description,
-          image_url: imageUrl,
-        })
-        .select();
+        .insert(newItem);
 
       if (error) throw error;
 
