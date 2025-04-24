@@ -1,9 +1,10 @@
-
-import { Users, BookOpen, Settings } from 'lucide-react';
+import { Users, BookOpen, Settings, Image, Calendar } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { UserManagement } from './UserManagement';
 import { ClassManagement } from './ClassManagement';
 import { SystemSettings } from './SystemSettings';
+import { GalleryManagement } from './gallery/GalleryManagement';
+import { EventManagement } from './events/EventManagement';
 
 interface Usuario {
   id: string;
@@ -51,6 +52,14 @@ export const AdminTabs = ({
           <BookOpen className="mr-2 h-4 w-4" />
           Turmas
         </TabsTrigger>
+        <TabsTrigger value="galeria" className="flex items-center">
+          <Image className="mr-2 h-4 w-4" />
+          Galeria
+        </TabsTrigger>
+        <TabsTrigger value="eventos" className="flex items-center">
+          <Calendar className="mr-2 h-4 w-4" />
+          Eventos
+        </TabsTrigger>
         <TabsTrigger value="config" className="flex items-center">
           <Settings className="mr-2 h-4 w-4" />
           Configurações
@@ -72,6 +81,14 @@ export const AdminTabs = ({
           turmasLoading={turmasLoading}
           setTurmas={setTurmas}
         />
+      </TabsContent>
+
+      <TabsContent value="galeria">
+        <GalleryManagement />
+      </TabsContent>
+
+      <TabsContent value="eventos">
+        <EventManagement />
       </TabsContent>
 
       <TabsContent value="config">
