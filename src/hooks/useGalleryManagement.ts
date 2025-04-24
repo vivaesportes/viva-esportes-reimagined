@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { toast } from '@/hooks/use-toast';
 
@@ -67,6 +67,7 @@ export const useGalleryManagement = () => {
 
       await loadItems();
     } catch (error: any) {
+      console.error('Error adding gallery item:', error);
       toast({
         title: "Erro ao adicionar item",
         description: error.message,
@@ -94,6 +95,7 @@ export const useGalleryManagement = () => {
 
       setItems(items.filter(item => item.id !== id));
     } catch (error: any) {
+      console.error('Error deleting gallery item:', error);
       toast({
         title: "Erro ao remover item",
         description: error.message,
@@ -107,14 +109,19 @@ export const useGalleryManagement = () => {
   const loadItems = async () => {
     try {
       setLoading(true);
+      console.log('Loading gallery items...');
+      
       const { data, error } = await supabase
         .from('gallery_collections')
         .select('*')
         .order('order_index', { ascending: true });
 
       if (error) throw error;
+      
+      console.log('Gallery items loaded:', data);
       setItems(data || []);
     } catch (error: any) {
+      console.error('Error loading gallery items:', error);
       toast({
         title: "Erro ao carregar galeria",
         description: error.message,
@@ -124,6 +131,11 @@ export const useGalleryManagement = () => {
       setLoading(false);
     }
   };
+
+  // Load items when the hook is initialized
+  useEffect(() => {
+    loadItems();
+  }, []);
 
   return {
     items,
