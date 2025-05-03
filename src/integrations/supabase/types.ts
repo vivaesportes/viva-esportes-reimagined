@@ -75,6 +75,27 @@ export type Database = {
         }
         Relationships: []
       }
+      N8N: {
+        Row: {
+          created_at: string
+          id: number
+          nome: string | null
+          telefone: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          nome?: string | null
+          telefone?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          nome?: string | null
+          telefone?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
