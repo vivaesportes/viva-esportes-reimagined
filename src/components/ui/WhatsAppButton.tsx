@@ -7,7 +7,7 @@ type WhatsAppButtonProps = {
   message?: string;
 };
 
-const DEFAULT_PHONE = "5531992901175"; // Updated with country code for proper WhatsApp link
+const DEFAULT_PHONE = "5531992901175"; // Número correto com código do país para o link do WhatsApp
 const DEFAULT_MESSAGE = "Olá! Gostaria de saber mais sobre a Viva Esportes.";
 
 const WhatsAppButton = ({
